@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>파자놀이 문제 만들기</title>
+<style>
+  :root{
+    --ink:#231F1B;
+    --ink2:#3A342E;
+    --paper:#FFFFFF;
+    --offwhite:#F2F2F0;
+    --seal:#B7312C;
+    --seal-dark:#8C231F;
+    --gold:#B4933F;
+    --muted:#6B6560;
+    --muted-l:#9A948C;
+    --line:#E4E1DB;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .hanja{ font-family:'Batang','Nanum Myeongjo',serif; }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:28px 20px 80px; }
+
+  /* header */
+  header{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+    padding-bottom:18px; border-bottom:1px solid var(--line); margin-bottom:24px; flex-wrap:wrap;}
+  .brand{ display:flex; align-items:center; gap:14px; }
+  .seal-badge{ width:46px; height:46px; border-radius:9px; background:var(--seal);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700; flex:none;}
+  h1{ font-size:24px; margin:0; letter-spacing:-0.02em; }
+  .kicker{ font-size:11px; letter-spacing:.14em; color:var(--seal); font-weight:700; margin:0 0 2px; text-transform:uppercase;}
+  .sub{ color:var(--muted); font-size:13px; margin-top:2px; }
+
+  /* tabs */
+  .storage-banner{ display:none; align-items:flex-start; gap:10px; background:var(--offwhite);
+    border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--muted); margin-bottom:18px; line-height:1.5;}
+  .storage-banner.show{ display:flex; }
+  .storage-banner b{ color:var(--ink); }
+  .storage-banner .dot{ width:8px;height:8px;border-radius:50%; flex:none; margin-top:4px; }
+  .storage-banner.local .dot{ background:var(--gold); }
+  .storage-banner.cloud .dot{ background:#3E6B4A; }
+
+  .share-box{ background:var(--offwhite); border-radius:12px; padding:16px; margin-top:18px; }
+  .share-box .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  textarea#importArea{ min-height:90px; font-size:12px; font-family:monospace; }
+  .btn-dark{ background:var(--ink); color:#fff; border-radius:999px; padding:9px 16px; font-size:13px; }
+  .btn-dark:hover{ background:var(--seal); }
+
+  .tabs{ display:flex; gap:8px; margin-bottom:26px; }
+  .tab-btn{ appearance:none; border:1px solid var(--line); background:var(--paper); color:var(--muted);
+    padding:10px 18px; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
+    transition:all .15s ease; font-family:inherit;}
+  .tab-btn:hover{ border-color:var(--seal); color:var(--seal); }
+  .tab-btn.active{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  section.block{ margin-bottom:30px; }
+  .block-title{ font-size:14px; font-weight:700; margin:0 0 10px; display:flex; align-items:center; gap:8px;}
+  .block-title .num{ width:22px;height:22px;border-radius:6px;background:var(--offwhite);color:var(--seal);
+    font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:800;}
+  .hint{ font-size:12.5px; color:var(--muted-l); margin:2px 0 12px; }
+
+  input[type=text], textarea{
+    width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    font-size:14px; font-family:inherit; color:var(--ink); background:var(--paper);
+  }
+  input[type=text]:focus, textarea:focus{ outline:none; border-color:var(--seal); box-shadow:0 0 0 3px rgba(183,49,44,.08); }
+  textarea{ resize:vertical; min-height:76px; line-height:1.5; }
+
+  /* lesson recap: 김삿갓 story */
+  .story-box{ background:var(--ink); color:var(--paper); border-radius:var(--radius); padding:22px 22px 20px; margin-bottom:30px; }
+  .story-kicker{ font-size:11px; letter-spacing:.14em; color:var(--gold); font-weight:700; text-transform:uppercase; margin:0 0 8px; }
+  .story-title{ font-size:17px; font-weight:700; margin:0 0 10px; }
+  .story-lead{ font-size:12.5px; color:#CFC9C1; line-height:1.6; margin:0 0 16px; }
+  .story-steps{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+  .story-step{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:12px; }
+  .story-step .sc{ font-size:12px; color:#B9B2A9; margin-bottom:6px; }
+  .story-step .sc .hanja{ color:#fff; font-size:15px; }
+  .story-step .sr{ display:flex; align-items:baseline; gap:6px; }
+  .story-step .sr .hanja{ font-size:22px; color:var(--gold); font-weight:700; }
+  .story-step .sr .sm{ font-size:11.5px; color:#CFC9C1; }
+  .story-step .say{ margin-top:8px; font-size:12px; color:#EDEAE5; font-style:italic; }
+  .story-note{ font-size:12px; color:#B9B2A9; line-height:1.55; border-top:1px solid rgba(255,255,255,.14); padding-top:12px; margin-top:2px;}
+
+  /* look-alike hanja pairs (slides 11-14) */
+  .confuse-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; }
+  .confuse-card{ border:1px solid var(--line); border-radius:10px; padding:12px; cursor:pointer; background:var(--paper); transition:border-color .12s ease; }
+  .confuse-card:hover{ border-color:var(--seal); }
+  .confuse-pair{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .confuse-pair .hanja{ font-size:30px; }
+  .confuse-pair .vs{ font-size:11px; color:var(--muted-l); font-weight:700; }
+  .confuse-answer{ display:none; font-size:11.5px; color:var(--muted); line-height:1.5; margin-top:10px; border-top:1px dashed var(--line); padding-top:8px;}
+  .confuse-card.open .confuse-answer{ display:block; }
+  .confuse-card .tap{ text-align:center; font-size:10.5px; color:var(--muted-l); margin-top:8px;}
+  .confuse-card.open .tap{ display:none; }
+
+  /* hanja grid */
+  .group-label{ font-size:12px; font-weight:700; color:var(--muted); margin:14px 0 8px; display:flex; align-items:center; gap:6px;}
+  .group-label .pill{ font-size:10.5px; background:var(--offwhite); color:var(--muted); padding:2px 8px; border-radius:999px; font-weight:700;}
+  .hanja-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(92px,1fr)); gap:8px; }
+  .hanja-card{ border:1px solid var(--line); border-radius:10px; background:var(--paper);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    padding:10px 6px 8px; cursor:pointer; transition:all .12s ease; color:var(--ink); position:relative;}
+  .hanja-card .cchar{ font-size:26px; line-height:1; }
+  .hanja-card .csound{ font-size:11px; line-height:1.2; color:var(--muted); font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif; text-align:center; }
+  .hanja-card:hover{ border-color:var(--seal); transform:translateY(-1px); z-index:8; }
+  .hanja-card.selected{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .hanja-card.selected .csound{ color:var(--muted-l); }
+  .hanja-card .tip{ position:absolute; left:50%; top:100%; transform:translateX(-50%) translateY(2px);
+    background:var(--ink); color:#fff; font-size:12.5px; padding:7px 11px; border-radius:8px;
+    white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s ease, transform .12s ease;
+    box-shadow:0 6px 16px rgba(0,0,0,.22); z-index:20; margin-top:6px; }
+  .hanja-card .tip b{ font-size:14px; color:var(--gold); font-weight:700; }
+  .hanja-card .tip .tipop{ color:var(--muted-l); margin:0 1px; }
+  .hanja-card:hover .tip{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .roll-row{ display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+  .btn{ appearance:none; border:none; cursor:pointer; font-family:inherit; font-weight:700; }
+  .btn-outline{ background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:999px; padding:9px 16px; font-size:13px;}
+  .btn-outline:hover{ border-color:var(--ink); }
+
+  /* detail card */
+  .detail{ display:none; background:var(--offwhite); border-radius:var(--radius); padding:20px; margin-top:16px;
+    align-items:center; gap:20px; }
+  .detail.show{ display:flex; }
+  .detail-char{ font-size:64px; font-weight:700; flex:none; width:100px; height:100px; background:var(--ink);
+    color:var(--gold); border-radius:12px; display:flex; align-items:center; justify-content:center; }
+  .detail-body{ flex:1; min-width:0; }
+  .detail-sound{ font-size:14px; font-weight:700; color:var(--seal); margin-bottom:6px;}
+  .breakdown{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:14px; margin-bottom:8px;}
+  .part{ background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:5px 10px; font-size:14px;}
+  .part b{ font-size:18px; margin-right:4px; }
+  .op{ color:var(--muted-l); font-weight:700; }
+  .explain{ font-size:12.5px; color:var(--muted); line-height:1.5;}
+  .type-tag{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px;
+    margin-left:8px; vertical-align:middle;}
+  .type-회의{ background:#E9F0EA; color:#3E6B4A; }
+  .type-형성{ background:#EFE7DA; color:#8A6A2C; }
+
+  /* difficulty stars */
+  .stars{ display:flex; gap:6px; margin-top:6px; }
+  .star{ width:34px; height:34px; border-radius:8px; border:1px solid var(--line); background:var(--paper);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--muted-l);}
+  .star.on{ background:var(--gold); border-color:var(--gold); color:#fff; }
+
+  /* preview card */
+  .preview-wrap{ margin-top:8px; }
+  .puzzle-card{ background:var(--ink); color:var(--paper); border-radius:var(--radius); padding:26px;
+    position:relative; overflow:hidden; }
+  .puzzle-card .wm{ position:absolute; right:-10px; bottom:-30px; font-size:150px; color:#2E2822; z-index:0; font-weight:700;}
+  .puzzle-card .content{ position:relative; z-index:1; }
+  .puzzle-card .author{ font-size:11px; color:var(--muted-l); letter-spacing:.06em; margin-bottom:10px; text-transform:uppercase;}
+  .puzzle-card .riddle{ font-size:19px; line-height:1.5; font-weight:700; min-height:1.5em; }
+  .puzzle-card .riddle.empty{ color:#5C5650; font-weight:400; font-style:italic; }
+  .puzzle-card .meta{ margin-top:14px; display:flex; align-items:center; gap:10px; }
+  .puzzle-card .diff{ color:var(--gold); font-size:13px; letter-spacing:2px; }
+
+  /* submit */
+  .submit-row{ display:flex; align-items:center; gap:16px; margin-top:20px; flex-wrap:wrap;}
+  .stamp-btn{ width:120px; height:120px; border-radius:50%; background:var(--seal); color:#fff; border:none;
+    font-size:16px; font-weight:800; cursor:pointer; flex:none; display:flex; align-items:center; justify-content:center;
+    text-align:center; line-height:1.3; transition:transform .08s ease, box-shadow .15s ease;
+    box-shadow:0 6px 0 var(--seal-dark); }
+  .stamp-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--seal-dark); }
+  .stamp-btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .stamp-btn.stamped{ animation:stampPop .5s ease; }
+  @keyframes stampPop{ 0%{transform:scale(1);} 35%{transform:scale(.86) rotate(-6deg);} 60%{transform:scale(1.08) rotate(2deg);} 100%{transform:scale(1);} }
+  .submit-note{ font-size:12.5px; color:var(--muted); max-width:360px; }
+  .status-msg{ font-size:13px; font-weight:700; margin-top:10px; display:none; }
+  .status-msg.ok{ color:#3E6B4A; display:block; }
+  .status-msg.err{ color:var(--seal); display:block; }
+
+  /* gallery */
+  .gallery-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+  .gallery-count{ font-size:13px; color:var(--muted); }
+  .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px; }
+  .flip-card{ perspective:1200px; height:190px; cursor:pointer; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:16px;
+    display:flex; flex-direction:column; }
+  .flip-front{ background:var(--offwhite); }
+  .flip-back{ background:var(--ink); color:var(--paper); transform:rotateY(180deg); align-items:flex-start; }
+  .flip-front .riddle{ font-size:14.5px; font-weight:700; line-height:1.45; flex:1; }
+  .flip-front .foot{ display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--muted-l); margin-top:8px;}
+  .flip-front .foot .diff{ color:var(--gold); letter-spacing:1px;}
+  .flip-back .bchar{ font-size:34px; font-weight:700; color:var(--gold); line-height:1; }
+  .flip-back .bsound{ font-size:12px; color:var(--muted-l); margin-top:4px;}
+  .flip-back .bparts{ font-size:12px; margin-top:8px; color:#DCD8D2; }
+  .flip-back .bexplain{ font-size:11.5px; color:var(--muted-l); margin-top:6px; line-height:1.4; }
+  .tap-hint{ font-size:10px; color:var(--muted-l); margin-top:auto; text-align:right;}
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted-l); }
+  .empty-state .em{ font-size:40px; margin-bottom:10px; font-family:'Batang',serif; color:var(--line); }
+  .loading{ text-align:center; padding:40px; color:var(--muted-l); font-size:13px; }
+
+  footer{ text-align:center; font-size:11px; color:var(--muted-l); margin-top:50px; }
+
+  @media (max-width:560px){
+    .detail{ flex-direction:column; align-items:flex-start; }
+    .submit-row{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="seal-badge hanja">印</div>
+      <div>
+        <p class="kicker">Hanja Puzzle Lab</p>
+        <h1>파자놀이 문제 만들기</h1>
+      </div>
+    </div>
+    <div class="sub">한자를 쪼개고, 뜻을 엮어서 나만의 수수께끼를 만들어봐요.</div>
+  </header>
+
+  <div class="storage-banner" id="storageBanner"></div>
+
+  <div class="share-box" id="sheetSetup" style="display:none;">
+    <p class="block-title" style="margin-bottom:4px;">🔗 구글 시트 연동 주소</p>
+    <p class="hint" style="margin-bottom:0;">선생님이 알려준 주소(Apps Script 웹앱 URL)를 붙여넣으면, 이 기기에서 만들거나 푸는 문제가 우리 반 전체와 실시간으로 공유돼요. 한 번만 입력하면 이 브라우저에 저장돼요.</p>
+    <div class="row">
+      <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/..../exec" style="flex:1; min-width:220px;"/>
+      <button class="btn btn-dark" id="sheetUrlSaveBtn">저장</button>
+      <button class="btn btn-outline" id="sheetUrlClearBtn">연동 해제</button>
+    </div>
+    <div class="status-msg" id="sheetUrlStatus"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="make">✏️ 문제 만들기</button>
+    <button class="tab-btn" data-tab="solve">🔍 친구 문제 풀어보기</button>
+    <button class="tab-btn" id="settingsToggle" style="margin-left:auto;">⚙️ 연동 설정</button>
+  </div>
+
+  <section class="block">
+    <div class="story-box">
+      <p class="story-kicker">지난 시간 이야기</p>
+      <p class="story-title">📖 김삿갓과 구두쇠 친구의 파자 대결</p>
+      <p class="story-lead">점심때가 지나도 밥을 안 주는 구두쇠 집에 들른 방랑 시인 김삿갓. 안주인과 바깥양반이 한자를 슬쩍 쪼개어 나누는 대화를 하자, 김삿갓도 파자로 뼈 있는 한 마디를 던졌어요.</p>
+      <div class="story-steps">
+        <div class="story-step">
+          <div class="sc"><span class="hanja">人良</span> + <span class="hanja">且八</span></div>
+          <div class="sr"><span class="hanja">食</span><span class="hanja">具</span><span class="sm">밥 식 + 갖출 구</span></div>
+          <div class="say">"밥상 다 차렸는데…"</div>
+        </div>
+        <div class="story-step">
+          <div class="sc"><span class="hanja">月月</span> + <span class="hanja">山山</span></div>
+          <div class="sr"><span class="hanja">朋</span><span class="hanja">出</span><span class="sm">벗 붕 + 나갈 출</span></div>
+          <div class="say">"저 손님 나가면 주게."</div>
+        </div>
+        <div class="story-step">
+          <div class="sc"><span class="hanja">犬者</span> + <span class="hanja">禾重</span></div>
+          <div class="sr"><span class="hanja">猪</span><span class="hanja">種</span><span class="sm">돼지 저 + 씨 종</span></div>
+          <div class="say">김삿갓: "돼지 종자로구나!"</div>
+        </div>
+        <div class="story-step">
+          <div class="sc"><span class="hanja">丁口</span> + <span class="hanja">竹夭</span></div>
+          <div class="sr"><span class="hanja">可</span><span class="hanja">笑</span><span class="sm">옳을 가 + 웃을 소</span></div>
+          <div class="say">"참으로 가소롭구나!"</div>
+        </div>
+      </div>
+      <p class="story-note">이렇게 두 글자를 위아래(또는 좌우)로 합쳐 새 글자를 만들고, 그 글자들을 이어 문장을 완성하는 것도 파자놀이예요. 아래에서는 먼저 한 글자짜리 파자로 연습해 보고, 익숙해지면 이런 문장형 파자에도 도전해보세요.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <p class="block-title"><span class="num">★</span> 헷갈리는 한자 짝꿍 구별하기</p>
+    <p class="hint">수업 시간에 살펴본 비슷하게 생긴 한자 짝꿍이에요. 눌러서 차이를 확인해보세요.</p>
+    <div class="confuse-grid" id="confuseGrid"></div>
+  </section>
+
+  <!-- MAKE PANEL -->
+  <div class="panel active" id="panel-make">
+
+    <section class="block">
+      <p class="block-title"><span class="num">1</span> 이름(또는 모둠) 적기</p>
+      <input type="text" id="authorInput" placeholder="예: 2반 김한문, 또는 3모둠" maxlength="20"/>
+    </section>
+
+    <section class="block">
+      <p class="block-title"><span class="num">2</span> 한자 고르기</p>
+      <p class="hint">쉬운 한자부터 하나 골라보세요. 뭘 고를지 모르겠다면 랜덤 뽑기!</p>
+
+      <div class="group-label"><span class="pill">뜻 + 뜻</span> 두 글자의 뜻을 합쳐서 만든 한자예요</div>
+      <div class="hanja-grid hanja" id="grid-hoe"></div>
+
+      <div class="group-label"><span class="pill">뜻 + 소리</span> 뜻을 나타내는 부분과 소리를 나타내는 부분이 합쳐진, 조금 더 도전적인 한자예요</div>
+      <div class="hanja-grid hanja" id="grid-hyung"></div>
+
+      <div class="roll-row">
+        <button class="btn btn-outline" id="rollBtn">🎲 랜덤으로 뽑기</button>
+      </div>
+
+      <div class="detail" id="detailBox">
+        <div class="detail-char hanja" id="detailChar">休</div>
+        <div class="detail-body">
+          <div class="detail-sound" id="detailSound">쉴 휴 <span class="type-tag" id="detailType">회의</span></div>
+          <div class="breakdown" id="detailParts"></div>
+          <div class="explain" id="detailExplain"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="block-title"><span class="num">3</span> 나만의 파자 문제 쓰기</p>
+      <p class="hint">위 글자의 뜻 풀이를 참고해서, 친구들이 맞힐 수 있는 재미있는 수수께끼 문장을 만들어보세요.</p>
+      <textarea id="riddleInput" placeholder="예: 나무 옆에 사람이 기대어 있는 이 글자는 무슨 뜻일까요?" maxlength="120"></textarea>
+      <div style="text-align:right; font-size:11px; color:var(--muted-l); margin-top:4px;"><span id="charCount">0</span>/120</div>
+
+      <p class="block-title" style="margin-top:16px;"><span class="num">★</span> 난이도 정하기</p>
+      <div class="stars" id="starRow">
+        <div class="star" data-v="1">★</div>
+        <div class="star" data-v="2">★</div>
+        <div class="star" data-v="3">★</div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="block-title"><span class="num">4</span> 문제 미리보기</p>
+      <div class="preview-wrap">
+        <div class="puzzle-card">
+          <div class="wm hanja" id="previewWm">字</div>
+          <div class="content">
+            <div class="author" id="previewAuthor">작성자 미입력</div>
+            <div class="riddle empty" id="previewRiddle">여기에 내가 쓴 문제가 보여요</div>
+            <div class="meta">
+              <span class="diff" id="previewDiff"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button class="stamp-btn hanja" id="submitBtn" disabled>도장 찍고<br/>제출하기</button>
+        <div class="submit-note">이름, 한자, 문제 문장을 모두 입력하면 도장을 찍을 수 있어요. 제출한 문제는 &lsquo;친구 문제 풀어보기&rsquo;에서 우리 반 모두가 볼 수 있어요.</div>
+      </div>
+      <div class="status-msg" id="statusMsg"></div>
+    </section>
+  </div>
+
+  <!-- SOLVE PANEL -->
+  <div class="panel" id="panel-solve">
+    <div class="gallery-toolbar">
+      <div class="gallery-count" id="galleryCount">불러오는 중...</div>
+      <button class="btn btn-outline" id="refreshBtn">↻ 새로고침</button>
+    </div>
+    <div id="galleryArea"><div class="loading">문제를 불러오는 중이에요...</div></div>
+
+    <div class="share-box" id="shareBox" style="display:none;">
+      <p class="block-title" style="margin-bottom:4px;">📤 다른 기기와 문제 주고받기</p>
+      <p class="hint" style="margin-bottom:0;">지금은 이 기기(브라우저)에만 문제가 저장돼요. 친구 것과 합치려면, 서로 내보내기한 글자를 복사해서 아래에 붙여넣고 가져오기를 눌러보세요.</p>
+      <div class="row">
+        <button class="btn btn-dark" id="exportBtn">내보내기 (복사)</button>
+      </div>
+      <div class="row" style="flex-direction:column; align-items:stretch;">
+        <textarea id="importArea" placeholder="친구가 보내준 내보내기 글자를 여기에 붙여넣으세요"></textarea>
+        <div class="row"><button class="btn btn-outline" id="importBtn">가져오기</button></div>
+      </div>
+      <div class="status-msg" id="shareStatus"></div>
+    </div>
+  </div>
+
+  <footer>파자놀이 문제 만들기 · 우리 반 한자 수업</footer>
+</div>
+
+<script>
+const HANJA_BANK = [
+  {char:'休', sound:'쉴 휴', type:'회의', parts:[{c:'人',m:'사람 인'},{c:'木',m:'나무 목'}], explain:'사람이 나무 옆에 기대어 쉬는 모습이에요.'},
+  {char:'林', sound:'수풀 림', type:'회의', parts:[{c:'木',m:'나무 목'},{c:'木',m:'나무 목'}], explain:'나무가 두 그루 모이면 수풀이 돼요.'},
+  {char:'森', sound:'수풀 삼', type:'회의', parts:[{c:'木',m:'나무 목'},{c:'木',m:'나무 목'},{c:'木',m:'나무 목'}], explain:'나무가 세 그루 모이면 울창한 숲이에요.'},
+  {char:'明', sound:'밝을 명', type:'회의', parts:[{c:'日',m:'해 일'},{c:'月',m:'달 월'}], explain:'해와 달이 함께 있으니 밝아요.'},
+  {char:'好', sound:'좋을 호', type:'회의', parts:[{c:'女',m:'여자 여'},{c:'子',m:'아들 자'}], explain:'여자가 아이를 안고 있는 모습이 좋아 보여요.'},
+  {char:'男', sound:'사내 남', type:'회의', parts:[{c:'田',m:'밭 전'},{c:'力',m:'힘 력'}], explain:'밭에서 힘을 쓰는 사람이 사내예요.'},
+  {char:'信', sound:'믿을 신', type:'회의', parts:[{c:'人',m:'사람 인'},{c:'言',m:'말씀 언'}], explain:'사람의 말은 믿을 수 있어야 해요.'},
+  {char:'安', sound:'편안 안', type:'회의', parts:[{c:'宀',m:'집 면'},{c:'女',m:'여자 여'}], explain:'집 안에 사람이 있으면 편안해요.'},
+  {char:'字', sound:'글자 자', type:'회의', parts:[{c:'宀',m:'집 면'},{c:'子',m:'아들 자'}], explain:'집 안에서 아이가 자라며 글자를 익혀요.'},
+  {char:'思', sound:'생각 사', type:'회의', parts:[{c:'田',m:'밭 전'},{c:'心',m:'마음 심'}], explain:'머리(밭 모양)와 마음을 써서 생각해요.'},
+  {char:'相', sound:'서로 상', type:'회의', parts:[{c:'木',m:'나무 목'},{c:'目',m:'눈 목'}], explain:'나무를 눈으로 서로 바라봐요.'},
+  {char:'看', sound:'볼 간', type:'회의', parts:[{c:'手',m:'손 수'},{c:'目',m:'눈 목'}], explain:'손을 눈 위에 얹고 멀리 봐요.'},
+  {char:'鳴', sound:'울 명', type:'회의', parts:[{c:'口',m:'입 구'},{c:'鳥',m:'새 조'}], explain:'새가 입으로 소리 내어 울어요.'},
+  {char:'泣', sound:'울 읍', type:'회의', parts:[{c:'氵',m:'물 수'},{c:'立',m:'설 립'}], explain:'서서 눈물(물)을 흘리며 울어요.'},
+  {char:'位', sound:'자리 위', type:'회의', parts:[{c:'人',m:'사람 인'},{c:'立',m:'설 립'}], explain:'사람이 서 있는 곳이 자리예요.'},
+  {char:'家', sound:'집 가', type:'회의', parts:[{c:'宀',m:'집 면'},{c:'豕',m:'돼지 시'}], explain:'옛날엔 지붕 아래 돼지를 키우는 곳이 집이었어요.'},
+  {char:'加', sound:'더할 가', type:'회의', parts:[{c:'力',m:'힘 력'},{c:'口',m:'입 구'}], explain:'힘에 말(입)을 더하면 응원하고 돕는 거예요.'},
+  {char:'炎', sound:'불꽃 염', type:'회의', parts:[{c:'火',m:'불 화'},{c:'火',m:'불 화'}], explain:'불이 두 개 겹치면 활활 타는 불꽃이에요.'},
+  {char:'岩', sound:'바위 암', type:'회의', parts:[{c:'山',m:'뫼 산'},{c:'石',m:'돌 석'}], explain:'산에 있는 큰 돌이 바위예요.'},
+  {char:'板', sound:'널빤지 판', type:'형성', parts:[{c:'木',m:'나무 목'},{c:'反',m:'돌이킬 반(소리)'}], explain:'나무(木)에 소리를 나타내는 反(반)이 더해졌어요.'},
+  {char:'沙', sound:'모래 사', type:'형성', parts:[{c:'氵',m:'물 수'},{c:'少',m:'적을 소(소리)'}], explain:'물(氵)이 적어지면(少) 드러나는 게 모래예요.'},
+  {char:'花', sound:'꽃 화', type:'형성', parts:[{c:'艹',m:'풀 초'},{c:'化',m:'될 화(소리)'}], explain:'풀(艹)이 변해서(化) 피어나는 게 꽃이에요.'},
+  {char:'草', sound:'풀 초', type:'형성', parts:[{c:'艹',m:'풀 초'},{c:'早',m:'이를 조(소리)'}], explain:'풀(艹)에 소리를 나타내는 早(조)가 더해졌어요.'},
+  {char:'洋', sound:'큰바다 양', type:'형성', parts:[{c:'氵',m:'물 수'},{c:'羊',m:'양 양(소리)'}], explain:'물(氵)에 소리를 나타내는 羊(양)이 더해졌어요.'},
+  {char:'器', sound:'그릇 기', type:'회의', parts:[{c:'犬',m:'개 견'},{c:'口',m:'입 구'}], explain:'그릇(입 구 모양) 여러 개를 개 한 마리가 지키고 있는 모습이에요. 수업 시간에 배운 글자예요!'}
+];
+
+const CONFUSE_PAIRS = [
+  {a:{c:'羊',m:'양 양'}, b:{c:'王',m:'임금 왕'}, tip:'羊은 위쪽에 뿔처럼 뻗은 두 획이 있고 획이 더 많아요. 王은 가로획 셋에 세로획 하나로 훨씬 단순해요.'},
+  {a:{c:'生',m:'날 생'}, b:{c:'牛',m:'소 우'}, tip:'牛는 획이 4개뿐인 소의 머리 모양이에요. 生은 그 위에 싹이 돋는 획이 하나 더 있어요.'},
+  {a:{c:'犬',m:'개 견'}, b:{c:'器',m:'그릇 기'}, tip:'器 안에는 犬이 통째로 들어 있어요! 입 구(口) 네 개 가운데에 개(犬)가 있는 모습이에요.'},
+  {a:{c:'或',m:'혹 혹'}, b:{c:'閒',m:'사이 한'}, tip:'或은 창 과(戈)와 입 구(口), 한 일(一)이 어우러진 글자예요. 閒은 문(門) 사이로 달(月)이 보이는 모습으로, 오늘날 間(사이 간)의 옛 형태예요.'}
+];
+
+let selected = null;
+let difficulty = 0;
+let submitting = false;
+
+// ---- Storage layer ----
+// Priority: 1) Google Sheets (if the teacher/student pasted an Apps Script
+// web app URL) -> a real shared backend that works even when this file is
+// downloaded and opened directly in a browser. 2) window.storage, when this
+// page happens to be running inside a Claude artifact. 3) this device's
+// local storage, so the tool still works stand-alone, just without sharing.
+const SHEET_URL_KEY = 'hanja_sheet_url';
+function getSheetUrl(){
+  try{ return (window.localStorage.getItem(SHEET_URL_KEY) || '').trim(); }
+  catch(e){ return ''; }
+}
+let SHEET_URL = getSheetUrl();
+const CLOUD = (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function');
+const LOCAL_KEY = 'hanja_puzzle_store_v1';
+
+function localReadAll(){
+  try{
+    const raw = window.localStorage.getItem(LOCAL_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+function localWriteAll(obj){
+  try{ window.localStorage.setItem(LOCAL_KEY, JSON.stringify(obj)); return true; }
+  catch(e){ return false; }
+}
+
+// text/plain avoids a CORS preflight (OPTIONS) request, which Apps Script
+// web apps don't handle — this keeps the request a "simple request" so the
+// browser sends it straight through.
+async function sheetSave(record){
+  const res = await fetch(SHEET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(record)
+  });
+  if(!res.ok) throw new Error('sheet save failed');
+  const data = await res.json();
+  if(!data || data.ok !== true) throw new Error('sheet save rejected');
+  return true;
+}
+async function sheetListAll(){
+  const res = await fetch(SHEET_URL, { method: 'GET' });
+  if(!res.ok) throw new Error('sheet list failed');
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+const Store = {
+  async save(id, record){
+    if(SHEET_URL){
+      return await sheetSave(record);
+    }
+    if(CLOUD){
+      return await window.storage.set('puzzle:'+id, JSON.stringify(record), true);
+    }
+    const all = localReadAll();
+    all[id] = record;
+    return localWriteAll(all);
+  },
+  async listAll(){
+    if(SHEET_URL){
+      return await sheetListAll();
+    }
+    if(CLOUD){
+      const listResult = await window.storage.list('puzzle:', true);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+      const records = [];
+      for(const k of keys){
+        try{
+          const r = await window.storage.get(k, true);
+          if(r && r.value) records.push(JSON.parse(r.value));
+        } catch(e){ /* skip broken entry */ }
+      }
+      return records;
+    }
+    const all = localReadAll();
+    return Object.values(all);
+  },
+  async mergeIn(records){
+    // used by the local-mode import feature
+    const all = localReadAll();
+    let added = 0;
+    records.forEach(rec=>{
+      if(rec && rec.id && !all[rec.id]){ all[rec.id] = rec; added++; }
+    });
+    localWriteAll(all);
+    return added;
+  }
+};
+
+function initStorageBanner(){
+  const banner = el('storageBanner');
+  banner.classList.add('show');
+  if(SHEET_URL){
+    banner.classList.add('cloud');
+    banner.innerHTML = '<span class="dot"></span><span><b>구글 시트와 연동됨</b> — 이 주소를 입력한 모두가 같은 구글 시트에 문제를 쓰고 읽어요. 새로고침 버튼을 누르면 다른 친구가 만든 문제도 바로 보여요.</span>';
+    el('shareBox').style.display = 'none';
+  } else if(CLOUD){
+    banner.classList.add('cloud');
+    banner.innerHTML = '<span class="dot"></span><span><b>우리 반과 공유되는 저장소</b>를 사용하고 있어요. 이 화면에 접속한 모두가 같은 문제 모음을 보게 돼요.</span>';
+    el('shareBox').style.display = 'none';
+  } else {
+    banner.classList.add('local');
+    banner.innerHTML = '<span class="dot"></span><span><b>이 기기(브라우저)에만 저장</b>되는 모드예요. 위쪽 &lsquo;⚙️ 연동 설정&rsquo;에서 구글 시트 주소를 넣으면 반 전체와 공유할 수 있어요. 주소가 없다면, 같은 컴퓨터에서 돌아가며 쓰거나 아래 &lsquo;문제 주고받기&rsquo;를 이용하세요.</span>';
+    el('shareBox').style.display = 'block';
+  }
+}
+
+// ---- Sheet URL settings panel ----
+function initSheetSetup(){
+  const input = el('sheetUrlInput');
+  input.value = SHEET_URL;
+  el('settingsToggle').addEventListener('click', ()=>{
+    const box = el('sheetSetup');
+    box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+  });
+  el('sheetUrlSaveBtn').addEventListener('click', ()=>{
+    const val = input.value.trim();
+    const status = el('sheetUrlStatus');
+    if(!val){
+      status.textContent = '주소를 먼저 입력해주세요.';
+      status.className = 'status-msg err';
+      return;
+    }
+    if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(val)){
+      status.textContent = '구글 Apps Script 웹앱 주소(https://script.google.com/...으로 시작)가 맞는지 확인해주세요.';
+      status.className = 'status-msg err';
+      return;
+    }
+    try{ window.localStorage.setItem(SHEET_URL_KEY, val); } catch(e){}
+    SHEET_URL = val;
+    status.textContent = '저장했어요! 이제 구글 시트와 연동돼요.';
+    status.className = 'status-msg ok';
+    initStorageBanner();
+    if(document.querySelector('.tab-btn[data-tab="solve"]').classList.contains('active')) loadGallery();
+  });
+  el('sheetUrlClearBtn').addEventListener('click', ()=>{
+    try{ window.localStorage.removeItem(SHEET_URL_KEY); } catch(e){}
+    SHEET_URL = '';
+    input.value = '';
+    const status = el('sheetUrlStatus');
+    status.textContent = '연동을 해제했어요. 이 기기에만 저장하는 모드로 돌아가요.';
+    status.className = 'status-msg ok';
+    initStorageBanner();
+  });
+}
+
+function el(id){ return document.getElementById(id); }
+
+function tipHtml(h){
+  const inner = h.parts.map(p => '<b class="hanja">'+p.c+'</b>('+p.m+')').join(' <span class="tipop">+</span> ');
+  return '<div class="tip">'+inner+'</div>';
+}
+
+function buildGrid(){
+  const hoe = HANJA_BANK.filter(h=>h.type==='회의');
+  const hyung = HANJA_BANK.filter(h=>h.type==='형성');
+  const gridHoe = el('grid-hoe');
+  const gridHyung = el('grid-hyung');
+  hoe.forEach(h=>{
+    const d = document.createElement('div');
+    d.className='hanja-card';
+    d.dataset.char = h.char;
+    d.innerHTML = '<div class="cchar hanja">'+h.char+'</div><div class="csound">'+h.sound+'</div>'+tipHtml(h);
+    d.addEventListener('click', ()=>selectChar(h, d));
+    gridHoe.appendChild(d);
+  });
+  hyung.forEach(h=>{
+    const d = document.createElement('div');
+    d.className='hanja-card';
+    d.dataset.char = h.char;
+    d.innerHTML = '<div class="cchar hanja">'+h.char+'</div><div class="csound">'+h.sound+'</div>'+tipHtml(h);
+    d.addEventListener('click', ()=>selectChar(h, d));
+    gridHyung.appendChild(d);
+  });
+}
+
+function buildConfuseGrid(){
+  const wrap = el('confuseGrid');
+  CONFUSE_PAIRS.forEach(p=>{
+    const d = document.createElement('div');
+    d.className = 'confuse-card';
+    d.innerHTML =
+      '<div class="confuse-pair hanja">'+
+        '<span>'+p.a.c+'</span><span class="vs">VS</span><span>'+p.b.c+'</span>'+
+      '</div>'+
+      '<div class="tap">눌러서 구별법 보기</div>'+
+      '<div class="confuse-answer">'+
+        '<b class="hanja">'+p.a.c+'</b>('+p.a.m+') · <b class="hanja">'+p.b.c+'</b>('+p.b.m+')<br/>'+p.tip+
+      '</div>';
+    d.addEventListener('click', ()=> d.classList.toggle('open'));
+    wrap.appendChild(d);
+  });
+}
+
+function selectChar(h, cardEl){
+  selected = h;
+  document.querySelectorAll('.hanja-card').forEach(c=>c.classList.remove('selected'));
+  if(cardEl) cardEl.classList.add('selected');
+
+  el('detailBox').classList.add('show');
+  el('detailChar').textContent = h.char;
+  el('detailSound').innerHTML = h.sound + ' <span class="type-tag type-'+h.type+'">'+ (h.type==='회의'?'뜻+뜻':'뜻+소리') +'</span>';
+  el('detailType').textContent = h.type;
+  const partsWrap = el('detailParts');
+  partsWrap.innerHTML = '';
+  h.parts.forEach((p,i)=>{
+    if(i>0){
+      const op = document.createElement('span');
+      op.className='op'; op.textContent='+';
+      partsWrap.appendChild(op);
+    }
+    const pd = document.createElement('span');
+    pd.className='part';
+    pd.innerHTML = '<b class="hanja">'+p.c+'</b>'+p.m;
+    partsWrap.appendChild(pd);
+  });
+  const eq = document.createElement('span');
+  eq.className='op'; eq.textContent='=';
+  partsWrap.appendChild(eq);
+  const res = document.createElement('span');
+  res.className='part';
+  res.innerHTML = '<b class="hanja">'+h.char+'</b>'+h.sound;
+  partsWrap.appendChild(res);
+
+  el('detailExplain').textContent = h.explain;
+  el('previewWm').textContent = h.char;
+  updatePreview();
+  updateSubmitState();
+}
+
+function updatePreview(){
+  const author = el('authorInput').value.trim();
+  const riddle = el('riddleInput').value.trim();
+  el('previewAuthor').textContent = author ? author : '작성자 미입력';
+  const rEl = el('previewRiddle');
+  if(riddle){ rEl.textContent = riddle; rEl.classList.remove('empty'); }
+  else { rEl.textContent = '여기에 내가 쓴 문제가 보여요'; rEl.classList.add('empty'); }
+  el('previewDiff').textContent = difficulty>0 ? '★'.repeat(difficulty)+'☆'.repeat(3-difficulty) : '';
+}
+
+function updateSubmitState(){
+  const author = el('authorInput').value.trim();
+  const riddle = el('riddleInput').value.trim();
+  const ok = selected && author.length>0 && riddle.length>0 && !submitting;
+  el('submitBtn').disabled = !ok;
+}
+
+el('authorInput').addEventListener('input', ()=>{ updatePreview(); updateSubmitState(); });
+el('riddleInput').addEventListener('input', ()=>{
+  el('charCount').textContent = el('riddleInput').value.length;
+  updatePreview(); updateSubmitState();
+});
+
+el('starRow').querySelectorAll('.star').forEach(s=>{
+  s.addEventListener('click', ()=>{
+    difficulty = parseInt(s.dataset.v,10);
+    document.querySelectorAll('#starRow .star').forEach(x=>{
+      x.classList.toggle('on', parseInt(x.dataset.v,10) <= difficulty);
+    });
+    updatePreview();
+  });
+});
+
+el('rollBtn').addEventListener('click', ()=>{
+  const pick = HANJA_BANK[Math.floor(Math.random()*HANJA_BANK.length)];
+  const cardEl = Array.from(document.querySelectorAll('.hanja-card')).find(c=>c.dataset.char===pick.char);
+  selectChar(pick, cardEl);
+  el('detailBox').scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+function showStatus(msg, ok){
+  const s = el('statusMsg');
+  s.textContent = msg;
+  s.className = 'status-msg ' + (ok ? 'ok' : 'err');
+}
+
+el('submitBtn').addEventListener('click', async ()=>{
+  if(!selected) return;
+  const author = el('authorInput').value.trim();
+  const riddle = el('riddleInput').value.trim();
+  if(!author || !riddle) return;
+
+  submitting = true;
+  updateSubmitState();
+  const btn = el('submitBtn');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '저장 중...';
+
+  const id = Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7);
+  const record = {
+    id, author, riddle,
+    difficulty: difficulty || 1,
+    hanja: selected.char,
+    sound: selected.sound,
+    type: selected.type,
+    parts: selected.parts,
+    explain: selected.explain,
+    createdAt: new Date().toISOString()
+  };
+
+  try{
+    const result = await Store.save(id, record);
+    if(result){
+      btn.classList.add('stamped');
+      btn.innerHTML = '도장<br/>완료!';
+      showStatus((SHEET_URL || CLOUD) ? '문제가 우리 반 문제 모음에 저장됐어요. 이어서 다른 한자로 또 만들어보세요!' : '이 기기에 저장됐어요. 다른 친구 것과 합치려면 \'문제 주고받기\'를 이용하세요.', true);
+      setTimeout(()=>{
+        btn.classList.remove('stamped');
+        btn.innerHTML = originalHTML;
+        // reset riddle + selection but keep author name
+        el('riddleInput').value = '';
+        el('charCount').textContent = '0';
+        difficulty = 0;
+        document.querySelectorAll('#starRow .star').forEach(x=>x.classList.remove('on'));
+        selected = null;
+        document.querySelectorAll('.hanja-card').forEach(c=>c.classList.remove('selected'));
+        el('detailBox').classList.remove('show');
+        el('previewWm').textContent = '字';
+        updatePreview();
+        updateSubmitState();
+      }, 1400);
+    } else {
+      throw new Error('no result');
+    }
+  } catch(e){
+    btn.innerHTML = originalHTML;
+    showStatus((SHEET_URL || CLOUD) ? '저장에 실패했어요. 인터넷 연결이나 구글 시트 연동 주소를 확인하고 다시 시도해주세요.' : '이 브라우저에 저장하지 못했어요. 시크릿(비공개) 모드이거나 저장공간이 꽉 찼을 수 있어요.', false);
+  } finally {
+    submitting = false;
+    updateSubmitState();
+  }
+});
+
+// ---- Tabs ----
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    el('panel-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab === 'solve'){ loadGallery(); }
+  });
+});
+
+// ---- Gallery ----
+async function loadGallery(){
+  const area = el('galleryArea');
+  area.innerHTML = '<div class="loading">문제를 불러오는 중이에요...</div>';
+  el('galleryCount').textContent = '불러오는 중...';
+  try{
+    const records = await Store.listAll();
+    if(records.length === 0){
+      area.innerHTML = '<div class="empty-state"><div class="em hanja">問</div>아직 등록된 문제가 없어요.<br/>&lsquo;문제 만들기&rsquo; 탭에서 첫 문제를 만들어보세요!</div>';
+      el('galleryCount').textContent = '0개의 문제';
+      return;
+    }
+    records.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+    el('galleryCount').textContent = records.length + '개의 문제';
+    renderGallery(records);
+  } catch(e){
+    area.innerHTML = '<div class="empty-state">문제를 불러오지 못했어요. 새로고침을 눌러 다시 시도해주세요.</div>';
+    el('galleryCount').textContent = '오류';
+  }
+}
+
+function renderGallery(records){
+  const area = el('galleryArea');
+  area.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'gallery-grid';
+  records.forEach(rec=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    const stars = '★'.repeat(rec.difficulty||1) + '☆'.repeat(3-(rec.difficulty||1));
+    const partsHtml = (rec.parts||[]).map(p=>'<b class="hanja">'+p.c+'</b>'+p.m).join(' + ');
+    card.innerHTML = `
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="riddle">${escapeHtml(rec.riddle)}</div>
+          <div class="foot"><span>${escapeHtml(rec.author)}</span><span class="diff">${stars}</span></div>
+          <div class="tap-hint">눌러서 정답 보기 →</div>
+        </div>
+        <div class="flip-face flip-back">
+          <div class="bchar hanja">${rec.hanja}</div>
+          <div class="bsound">${escapeHtml(rec.sound)}</div>
+          <div class="bparts hanja">${partsHtml}</div>
+          <div class="bexplain">${escapeHtml(rec.explain||'')}</div>
+        </div>
+      </div>`;
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+    grid.appendChild(card);
+  });
+  area.appendChild(grid);
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+el('refreshBtn').addEventListener('click', loadGallery);
+
+function showShareStatus(msg, ok){
+  const s = el('shareStatus');
+  s.textContent = msg;
+  s.className = 'status-msg ' + (ok ? 'ok' : 'err');
+}
+
+el('exportBtn') && el('exportBtn').addEventListener('click', async ()=>{
+  const records = await Store.listAll();
+  if(records.length === 0){
+    showShareStatus('아직 내보낼 문제가 없어요. 먼저 문제를 만들어보세요.', false);
+    return;
+  }
+  const payload = 'HANJAPUZZLE1:' + btoa(unescape(encodeURIComponent(JSON.stringify(records))));
+  try{
+    await navigator.clipboard.writeText(payload);
+    showShareStatus(records.length + '개의 문제를 클립보드에 복사했어요. 친구에게 붙여넣기로 전달하세요!', true);
+  } catch(e){
+    // clipboard API blocked: fall back to a manual copy box
+    const ta = el('importArea');
+    ta.value = payload;
+    ta.select();
+    showShareStatus('자동 복사가 막혀 있어요. 아래 칸에 대신 채워뒀으니 직접 복사(Ctrl+C)해서 전달하세요.', false);
+  }
+});
+
+el('importBtn') && el('importBtn').addEventListener('click', async ()=>{
+  const raw = el('importArea').value.trim();
+  if(!raw){ showShareStatus('붙여넣은 내용이 없어요.', false); return; }
+  try{
+    if(!raw.startsWith('HANJAPUZZLE1:')) throw new Error('bad format');
+    const json = decodeURIComponent(escape(atob(raw.slice('HANJAPUZZLE1:'.length))));
+    const records = JSON.parse(json);
+    if(!Array.isArray(records)) throw new Error('bad payload');
+    const added = await Store.mergeIn(records);
+    showShareStatus(added + '개의 새 문제를 가져왔어요!', true);
+    el('importArea').value = '';
+    loadGallery();
+  } catch(e){
+    showShareStatus('가져오기에 실패했어요. 전달받은 글자를 다시 확인해주세요.', false);
+  }
+});
+
+buildGrid();
+buildConfuseGrid();
+updatePreview();
+initSheetSetup();
+initStorageBanner();
+</script>
+</body>
+</html>
