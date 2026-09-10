@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>나만의 블루밍 메시지 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:#eaf6ff;
+    --sky-bot:#cfeaff;
+    --deep:#3f8fc4;
+    --ink:#1f3358;
+    --ink-soft:#4a5b7a;
+    --paper:#ffffff;
+    --rose:#f3a9c6;
+    --rose-deep:#e0648f;
+    --rose-pale:#fdeef4;
+    --chip:#eaf6ff;
+    --chip-ink:#2a6690;
+    --line:#dfeaf5;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 8%, rgba(255,255,255,.9) 0 3px, transparent 4px),
+      radial-gradient(circle at 82% 18%, rgba(255,255,255,.8) 0 2px, transparent 3px),
+      radial-gradient(circle at 60% 5%, rgba(255,255,255,.7) 0 2px, transparent 3px),
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,.6) 0 2px, transparent 3px),
+      radial-gradient(circle at 90% 45%, rgba(255,255,255,.7) 0 3px, transparent 4px),
+      linear-gradient(180deg, var(--sky-top), var(--sky-bot) 60%, #fdeef4 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+  }
+  .wrap{ max-width:640px; margin:0 auto; padding:28px 18px 70px; }
+
+  /* Hero ribbon */
+  .hero{ text-align:center; margin-bottom:22px; }
+  .ribbon{
+    display:inline-block;
+    font-family:'Gowun Dodum', sans-serif;
+    font-size:14px;
+    letter-spacing:.02em;
+    color:#8a3f5c;
+    background:var(--rose);
+    padding:7px 22px;
+    border-radius:999px;
+    position:relative;
+    margin-bottom:14px;
+  }
+  .ribbon::before, .ribbon::after{
+    content:"";
+    position:absolute;
+    top:2px;
+    width:0; height:0;
+    border-style:solid;
+  }
+  .ribbon::before{ left:-9px; border-width:11px 9px 11px 0; border-color:transparent var(--rose) transparent transparent; }
+  .ribbon::after{ right:-9px; border-width:11px 0 11px 9px; border-color:transparent transparent transparent var(--rose); }
+  h1{
+    font-family:'Gowun Dodum', sans-serif;
+    font-size:28px;
+    line-height:1.35;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .subtitle{ color:var(--ink-soft); font-size:14.5px; margin:0; }
+
+  /* card */
+  .card{
+    background:var(--paper);
+    border-radius:20px;
+    padding:22px 22px;
+    box-shadow:0 10px 26px rgba(63,143,196,.14);
+    margin-bottom:18px;
+  }
+  .card h2{
+    font-family:'Gowun Dodum', sans-serif;
+    font-size:18px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card p{ margin:0 0 8px; line-height:1.65; font-size:15px; color:var(--ink); }
+  .card p:last-child{ margin-bottom:0; }
+  .note{ color:var(--ink-soft); font-size:13.5px; }
+
+  /* hanja chips */
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    background:var(--chip);
+    color:var(--chip-ink);
+    font-size:14px;
+    font-weight:700;
+    padding:7px 13px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .chip small{ font-weight:500; margin-left:3px; opacity:.85; }
+
+  /* teacher example */
+  .example{
+    background:linear-gradient(180deg,#fbfdff,#f3f9fd);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    font-size:15px;
+    line-height:1.85;
+    color:var(--ink);
+  }
+  .example .who{
+    font-size:12.5px;
+    color:var(--deep);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+
+  /* connect settings */
+  .connect-toggle{
+    width:100%;
+    background:#f4f8fb;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:13px 16px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+  }
+  .connect-panel{
+    display:none;
+    margin-top:10px;
+  }
+  .connect-panel.open{ display:block; }
+  .connect-panel input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:13.5px;
+    margin-bottom:10px;
+    font-family:monospace;
+  }
+  .row-btns{ display:flex; gap:8px; }
+  .btn{
+    border:none;
+    border-radius:12px;
+    padding:11px 18px;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-dark{ background:var(--ink); color:#fff; }
+  .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .msg-line{ font-size:13.5px; margin-top:8px; font-weight:600; }
+  .msg-line.ok{ color:#2e8b57; }
+  .msg-line.err{ color:#c94f4f; }
+
+  /* form */
+  label{ display:block; font-size:13.5px; font-weight:700; color:var(--ink-soft); margin:0 0 6px; }
+  input[type=text]{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:15px;
+    margin-bottom:16px;
+    font-family:inherit;
+  }
+  textarea{
+    width:100%;
+    min-height:120px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    font-size:15.5px;
+    line-height:1.7;
+    font-family:inherit;
+    resize:vertical;
+    margin-bottom:8px;
+  }
+  .counter{ text-align:right; font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; }
+
+  .submit-wrap{ text-align:center; margin:22px 0 6px; }
+  .submit-btn{
+    background:var(--rose-deep);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:16px 40px;
+    font-size:16px;
+    font-weight:900;
+    font-family:'Gowun Dodum', sans-serif;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(224,100,143,.35);
+  }
+  .submit-btn:active{ transform:translateY(1px); }
+  .submit-btn:disabled{ opacity:.5; cursor:default; }
+  .form-status{ text-align:center; font-size:14px; font-weight:700; margin-top:12px; min-height:20px; }
+  .form-status.ok{ color:#2e8b57; }
+  .form-status.err{ color:#c94f4f; }
+
+  /* shared list */
+  .list-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .list-head h2{ margin:0; }
+  .refresh-btn{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--deep);
+    cursor:pointer;
+  }
+  .bloom-card{
+    background:var(--paper);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:12px;
+    box-shadow:0 6px 16px rgba(63,143,196,.1);
+    border-left:4px solid var(--rose);
+  }
+  .bloom-card .author{
+    font-size:13px;
+    font-weight:800;
+    color:var(--rose-deep);
+    margin-bottom:6px;
+  }
+  .bloom-card .message{
+    white-space:pre-line;
+    font-size:15px;
+    line-height:1.75;
+    color:var(--ink);
+  }
+  .empty{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14px;
+    padding:30px 10px;
+  }
+
+  footer{ text-align:center; color:var(--ink-soft); font-size:12.5px; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="ribbon">K-POP으로 배우는 한문 · Blueming</span>
+    <h1>🌹 나만의 블루밍 메시지<br>만들기</h1>
+    <p class="subtitle">배운 한자어로 친구에게 보낼 나만의 메시지를 완성해보세요</p>
+  </div>
+
+  <div class="card">
+    <h2>✏️ 활동 방법</h2>
+    <p>배운 한자어 중 <strong>3개 이상</strong>을 골라, 친구에게 보낼 <strong>4줄 메시지</strong>를 완성해보자.</p>
+    <p class="note">한글과 한자를 자유롭게 섞어써도 좋아요!</p>
+  </div>
+
+  <div class="card">
+    <h2>📖 힌트 한자 단어장</h2>
+    <div class="chips" id="hanjaChips"></div>
+  </div>
+
+  <div class="card">
+    <h2>💌 선생님의 예시</h2>
+    <div class="example">
+      <div class="who">선생님의 블루밍</div>
+      只今 너의 心理가 궁금해
+薔薇처럼 香氣나는 그 마음
+우리만 아는 祕密이었으면
+내일도 呼吸처럼 자연스럽게
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔗 구글 시트 연동</h2>
+    <p class="note" style="margin-bottom:12px;">우리 반 구글 시트에 이미 연결되어 있어요! 별도로 설정하지 않아도 바로 메시지를 쓰고 읽을 수 있어요. (선생님만 아래에서 주소를 확인/변경할 수 있어요)</p>
+    <button class="connect-toggle" id="connectToggle">
+      <span>⚙️ 연동 설정</span>
+      <span id="connectStatus" style="font-weight:600; font-size:12.5px; color:var(--ink-soft);">미연동</span>
+    </button>
+    <div class="connect-panel" id="connectPanel">
+      <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/..../exec" />
+      <div class="row-btns">
+        <button class="btn btn-dark" id="saveConnect">저장</button>
+        <button class="btn btn-ghost" id="clearConnect">연동 해제</button>
+      </div>
+      <div class="msg-line" id="connectMsg"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🌸 나의 블루밍 메시지 쓰기</h2>
+    <label for="authorInput">이름 (또는 모둠)</label>
+    <input type="text" id="authorInput" maxlength="20" placeholder="예: 3반 김한문" />
+    <label for="messageInput">4줄 메시지</label>
+    <textarea id="messageInput" maxlength="200" placeholder="배운 한자어 3개 이상을 넣어서&#10;친구에게 보낼 4줄 메시지를 써보세요"></textarea>
+    <div class="counter"><span id="charCount">0</span>/200</div>
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn">🌹 블루밍 전송하기</button>
+      <div class="form-status" id="formStatus"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="list-head">
+      <h2 style="margin:0;">💐 친구들의 블루밍 모아보기</h2>
+      <button class="refresh-btn" id="refreshBtn">새로고침</button>
+    </div>
+    <div id="bloomList"><div class="empty">불러오는 중...</div></div>
+  </div>
+
+  <footer>나만의 블루밍 메시지 만들기 · K-POP으로 배우는 한문</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'blueming_script_url';
+  const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNRP6GgCHEpeJyYmghR5Bx7CwXVoupBlX3Uk_eZMzfNwDPmIvw_IxXh9T3O_w7d-7Nbg/exec';
+  const HANJA_BANK = [
+    ['微妙','미묘'],['心理','심리'],['只今','지금'],['中','중'],
+    ['薔薇','장미'],['香氣','향기'],['醉','취'],['祕密','비밀'],
+    ['庭園','정원'],['作業','작업'],['興味','흥미'],['作品','작품'],
+    ['關係','관계'],['幕','막'],['隱喩','은유'],['解釋','해석'],
+    ['色','색'],['風船','풍선'],['呼吸','호흡'],['百萬','백만'],['漆','칠']
+  ];
+
+  const $ = (id) => document.getElementById(id);
+
+  // render hanja chips
+  const chipsHtml = HANJA_BANK.map(([h,s]) => `<span class="chip">${h}<small>${s}</small></span>`).join('');
+  $('hanjaChips').innerHTML = chipsHtml;
+
+  // connect settings
+  const elConnectToggle = $('connectToggle');
+  const elConnectPanel = $('connectPanel');
+  const scriptUrlInput = $('scriptUrl');
+  const elConnectStatus = $('connectStatus');
+  const elConnectMsg = $('connectMsg');
+
+  function getScriptUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_SCRIPT_URL; }
+
+  function refreshConnectUI(){
+    const url = getScriptUrl();
+    scriptUrlInput.value = url;
+    elConnectStatus.textContent = '연동됨';
+    elConnectStatus.style.color = '#2e8b57';
+  }
+
+  elConnectToggle.addEventListener('click', () => {
+    elConnectPanel.classList.toggle('open');
+  });
+
+  function isValidExecUrl(url){
+    return /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\/?$/.test(url.trim());
+  }
+
+  $('saveConnect').addEventListener('click', () => {
+    const val = scriptUrlInput.value.trim();
+    if(!val){
+      elConnectMsg.textContent = '주소를 입력해주세요.';
+      elConnectMsg.className = 'msg-line err';
+      return;
+    }
+    if(!isValidExecUrl(val)){
+      elConnectMsg.textContent = '올바른 주소가 아니에요. script.google.com/macros/s/...../exec 형태인지 확인해주세요. (googleusercontent.com 주소는 사용할 수 없어요)';
+      elConnectMsg.className = 'msg-line err';
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, val);
+    elConnectMsg.textContent = '저장했어요! 이제 구글 시트와 연동돼요.';
+    elConnectMsg.className = 'msg-line ok';
+    refreshConnectUI();
+    loadBlooms();
+  });
+
+  $('clearConnect').addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    scriptUrlInput.value = '';
+    elConnectMsg.textContent = '연동이 해제됐어요.';
+    elConnectMsg.className = 'msg-line';
+    refreshConnectUI();
+  });
+
+  refreshConnectUI();
+
+  // character counter
+  const elMessageInput = $('messageInput');
+  const elCharCount = $('charCount');
+  elMessageInput.addEventListener('input', () => {
+    elCharCount.textContent = elMessageInput.value.length;
+  });
+
+  // submit
+  const elSubmitBtn = $('submitBtn');
+  const elFormStatus = $('formStatus');
+
+  function uid(){
+    return 'b' + Math.random().toString(36).slice(2, 10);
+  }
+
+  elSubmitBtn.addEventListener('click', async () => {
+    const url = getScriptUrl();
+    const author = $('authorInput').value.trim();
+    const message = elMessageInput.value.trim();
+
+    if(!url){
+      elFormStatus.textContent = '먼저 ⚙️ 연동 설정에서 구글 시트 주소를 저장해주세요.';
+      elFormStatus.className = 'form-status err';
+      return;
+    }
+    if(!author || !message){
+      elFormStatus.textContent = '이름과 메시지를 모두 입력해주세요.';
+      elFormStatus.className = 'form-status err';
+      return;
+    }
+
+    elSubmitBtn.disabled = true;
+    elFormStatus.textContent = '전송 중...';
+    elFormStatus.className = 'form-status';
+
+    try{
+      const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          id: uid(),
+          author,
+          message,
+          createdAt: new Date().toISOString()
+        })
+      });
+      const data = await res.json();
+      if(data.ok){
+        elFormStatus.textContent = '블루밍 메시지를 보냈어요! 🌸';
+        elFormStatus.className = 'form-status ok';
+        elMessageInput.value = '';
+        elCharCount.textContent = '0';
+        loadBlooms();
+      } else {
+        throw new Error(data.error || '알 수 없는 오류');
+      }
+    } catch(err){
+      elFormStatus.textContent = '저장에 실패했어요. 인터넷 연결이나 구글 시트 연동 주소를 확인하고 다시 시도해주세요.';
+      elFormStatus.className = 'form-status err';
+    } finally {
+      elSubmitBtn.disabled = false;
+    }
+  });
+
+  // load & render list
+  const elBloomList = $('bloomList');
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadBlooms(){
+    const url = getScriptUrl();
+    if(!url){
+      elBloomList.innerHTML = '<div class="empty">⚙️ 연동 설정에서 구글 시트 주소를 먼저 저장해주세요.</div>';
+      return;
+    }
+    elBloomList.innerHTML = '<div class="empty">불러오는 중...</div>';
+    try{
+      const res = await fetch(url);
+      const data = await res.json();
+      if(!Array.isArray(data) || data.length === 0){
+        elBloomList.innerHTML = '<div class="empty">아직 도착한 블루밍 메시지가 없어요. 첫 번째 메시지를 보내보세요!</div>';
+        return;
+      }
+      const sorted = data.slice().reverse();
+      elBloomList.innerHTML = sorted.map(item => `
+        <div class="bloom-card">
+          <div class="author">${escapeHtml(item.author || '익명')}</div>
+          <div class="message">${escapeHtml(item.message || '')}</div>
+        </div>
+      `).join('');
+    } catch(err){
+      elBloomList.innerHTML = '<div class="empty">불러오지 못했어요. 새로고침을 눌러 다시 시도해주세요.</div>';
+    }
+  }
+
+  $('refreshBtn').addEventListener('click', loadBlooms);
+  loadBlooms();
+</script>
+</body>
+</html>
