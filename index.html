@@ -230,7 +230,7 @@
 
   <div class="share-box" id="sheetSetup" style="display:none;">
     <p class="block-title" style="margin-bottom:4px;">🔗 구글 시트 연동 주소</p>
-    <p class="hint" style="margin-bottom:0;">선생님이 알려준 주소(Apps Script 웹앱 URL)를 붙여넣으면, 이 기기에서 만들거나 푸는 문제가 우리 반 전체와 실시간으로 공유돼요. 한 번만 입력하면 이 브라우저에 저장돼요.</p>
+    <p class="hint" style="margin-bottom:0;">우리 반 구글 시트에 이미 연결되어 있어서, 별도로 설정하지 않아도 바로 문제를 만들고 풀 수 있어요. (선생님만 아래에서 주소를 확인/변경할 수 있어요)</p>
     <div class="row">
       <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/..../exec" style="flex:1; min-width:220px;"/>
       <button class="btn btn-dark" id="sheetUrlSaveBtn">저장</button>
@@ -423,9 +423,15 @@ let submitting = false;
 // page happens to be running inside a Claude artifact. 3) this device's
 // local storage, so the tool still works stand-alone, just without sharing.
 const SHEET_URL_KEY = 'hanja_sheet_url';
+// 우리 반 구글 시트 주소를 기본값으로 미리 넣어둡니다.
+// 학생들은 이 주소를 직접 입력하지 않아도 바로 사용할 수 있어요.
+const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwnKPvSn7e6_ktuDd0TKxog6We_pCEfEBnyTckdP6bhAVFFa7AemetnKlYFND0aTvvmYw/exec';
 function getSheetUrl(){
-  try{ return (window.localStorage.getItem(SHEET_URL_KEY) || '').trim(); }
-  catch(e){ return ''; }
+  try{
+    const saved = (window.localStorage.getItem(SHEET_URL_KEY) || '').trim();
+    return saved || DEFAULT_SHEET_URL;
+  }
+  catch(e){ return DEFAULT_SHEET_URL; }
 }
 let SHEET_URL = getSheetUrl();
 const CLOUD = (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function');
@@ -540,8 +546,8 @@ function initSheetSetup(){
       status.className = 'status-msg err';
       return;
     }
-    if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(val)){
-      status.textContent = '구글 Apps Script 웹앱 주소(https://script.google.com/...으로 시작)가 맞는지 확인해주세요.';
+    if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\/?$/.test(val)){
+      status.textContent = '올바른 주소가 아니에요. script.google.com/macros/s/...../exec 형태인지 확인해주세요. (googleusercontent.com 주소는 사용할 수 없어요)';
       status.className = 'status-msg err';
       return;
     }
@@ -554,12 +560,13 @@ function initSheetSetup(){
   });
   el('sheetUrlClearBtn').addEventListener('click', ()=>{
     try{ window.localStorage.removeItem(SHEET_URL_KEY); } catch(e){}
-    SHEET_URL = '';
-    input.value = '';
+    SHEET_URL = DEFAULT_SHEET_URL;
+    input.value = SHEET_URL;
     const status = el('sheetUrlStatus');
-    status.textContent = '연동을 해제했어요. 이 기기에만 저장하는 모드로 돌아가요.';
+    status.textContent = '기본 주소로 되돌렸어요. 우리 반 구글 시트에 계속 연동돼요.';
     status.className = 'status-msg ok';
     initStorageBanner();
+    if(document.querySelector('.tab-btn[data-tab="solve"]').classList.contains('active')) loadGallery();
   });
 }
 
