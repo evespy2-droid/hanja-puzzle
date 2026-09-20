@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>나의 인생 사자성어 포스터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#231F1B;
+    --ink2:#3A342E;
+    --paper:#FFFFFF;
+    --offwhite:#F7F4EE;
+    --seal:#B7312C;
+    --seal-dark:#8C231F;
+    --gold:#B4933F;
+    --gold-pale:#F4EAD2;
+    --muted:#6B6560;
+    --muted-l:#9A948C;
+    --line:#E4E1DB;
+    --radius:16px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--offwhite);
+    color:var(--ink);
+    font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .hanja{ font-family:'Batang','Nanum Myeongjo',serif; }
+  .wrap{ max-width:900px; margin:0 auto; padding:28px 18px 80px; }
+
+  /* header */
+  .hero{ text-align:center; margin-bottom:22px; }
+  .kicker{
+    display:inline-block;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    color:#fff;
+    background:var(--seal);
+    padding:6px 16px;
+    border-radius:999px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:'Gowun Dodum', sans-serif;
+    font-size:27px;
+    line-height:1.35;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .subtitle{ color:var(--muted); font-size:14.5px; margin:0; line-height:1.6; }
+
+  /* card */
+  .card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    padding:22px 22px;
+    box-shadow:0 8px 22px rgba(35,31,27,.06);
+    margin-bottom:18px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    font-family:'Gowun Dodum', sans-serif;
+    font-size:18px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card p{ margin:0 0 8px; line-height:1.65; font-size:15px; color:var(--ink); }
+  .card p:last-child{ margin-bottom:0; }
+  .note{ color:var(--muted); font-size:13.5px; }
+
+  /* idiom chips */
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    background:var(--gold-pale);
+    color:#7a5f1c;
+    font-size:13.5px;
+    font-weight:700;
+    padding:8px 13px;
+    border-radius:999px;
+    white-space:nowrap;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:border-color .12s ease;
+  }
+  .chip:hover{ border-color:var(--gold); }
+  .chip small{ font-weight:500; margin-left:4px; opacity:.85; }
+
+  /* teacher example */
+  .example{
+    background:var(--ink);
+    color:#fff;
+    border-radius:14px;
+    padding:18px 20px;
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .example .ex-idiom{ font-size:26px; font-weight:700; color:var(--gold); flex:none; }
+  .example .ex-idiom .sub{ display:block; font-size:11.5px; color:#CFC9C1; font-weight:400; margin-top:4px; }
+  .example .ex-body{ flex:1; min-width:180px; }
+  .example .who{ font-size:12px; color:#B9B2A9; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em; }
+  .example .ex-text{ font-size:14.5px; line-height:1.7; color:#EDEAE5; }
+
+  /* connect settings */
+  .connect-toggle{
+    width:100%;
+    background:var(--offwhite);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:13px 16px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+  }
+  .connect-panel{ display:none; margin-top:10px; }
+  .connect-panel.open{ display:block; }
+  .connect-panel input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:13.5px;
+    margin-bottom:10px;
+    font-family:monospace;
+  }
+  .row-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .btn{
+    border:none;
+    border-radius:12px;
+    padding:11px 18px;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn-dark{ background:var(--ink); color:#fff; }
+  .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .btn-outline{ background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:999px; padding:9px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .btn-outline:hover{ border-color:var(--seal); color:var(--seal); }
+  .msg-line{ font-size:13.5px; margin-top:8px; font-weight:600; }
+  .msg-line.ok{ color:#2e7d4f; }
+  .msg-line.err{ color:#c94f4f; }
+
+  .storage-banner{ display:flex; align-items:flex-start; gap:10px; background:var(--offwhite);
+    border-radius:12px; padding:12px 14px; font-size:12.5px; color:var(--muted); margin-bottom:18px; line-height:1.55; border:1px solid var(--line);}
+  .storage-banner .dot{ width:8px;height:8px;border-radius:50%; flex:none; margin-top:4px; background:var(--gold); }
+  .storage-banner.cloud .dot{ background:#2e7d4f; }
+  .storage-banner b{ color:var(--ink); }
+
+  /* form */
+  label{ display:block; font-size:13.5px; font-weight:700; color:var(--muted); margin:0 0 6px; }
+  input[type=text]{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:15px;
+    margin-bottom:16px;
+    font-family:inherit;
+  }
+  textarea{
+    width:100%;
+    min-height:90px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    font-size:15px;
+    line-height:1.7;
+    font-family:inherit;
+    resize:vertical;
+    margin-bottom:8px;
+  }
+  .counter{ text-align:right; font-size:12.5px; color:var(--muted); margin-bottom:16px; }
+  input[type=text]:focus, textarea:focus{ outline:none; border-color:var(--seal); box-shadow:0 0 0 3px rgba(183,49,44,.08); }
+
+  /* image upload */
+  .upload-box{
+    border:2px dashed var(--line);
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+    margin-bottom:16px;
+    background:var(--offwhite);
+  }
+  .upload-box input[type=file]{ display:none; }
+  .upload-label{
+    display:inline-block;
+    background:var(--ink);
+    color:#fff;
+    padding:11px 22px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .upload-hint{ font-size:12.5px; color:var(--muted-l); margin-top:10px; }
+  .preview-wrap{ margin-top:16px; display:none; }
+  .preview-wrap.show{ display:block; }
+  .preview-wrap img{ max-width:100%; max-height:320px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.12); }
+  .preview-status{ font-size:12.5px; color:var(--muted); margin-top:8px; }
+
+  .submit-wrap{ text-align:center; margin:22px 0 6px; }
+  .submit-btn{
+    background:var(--seal);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:16px 40px;
+    font-size:16px;
+    font-weight:900;
+    font-family:'Gowun Dodum', sans-serif;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(183,49,44,.28);
+  }
+  .submit-btn:active{ transform:translateY(1px); }
+  .submit-btn:disabled{ opacity:.45; cursor:default; box-shadow:none; }
+  .form-status{ text-align:center; font-size:14px; font-weight:700; margin-top:12px; min-height:20px; }
+  .form-status.ok{ color:#2e7d4f; }
+  .form-status.err{ color:#c94f4f; }
+
+  /* gallery */
+  .list-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .list-head h2{ margin:0; }
+  .gallery-count{ font-size:13px; color:var(--muted); }
+  .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:16px; }
+  .poster-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .poster-card:hover{ transform:translateY(-3px); box-shadow:0 10px 22px rgba(35,31,27,.12); }
+  .poster-card .thumb{ width:100%; aspect-ratio:3/4; object-fit:cover; background:var(--offwhite); display:block; }
+  .poster-card .info{ padding:12px 13px 14px; }
+  .poster-card .idiom{ font-size:15.5px; font-weight:700; color:var(--seal); margin-bottom:4px; line-height:1.3; }
+  .poster-card .author{ font-size:12px; color:var(--muted-l); font-weight:700; }
+  .empty-state{ text-align:center; padding:50px 20px; color:var(--muted-l); }
+  .empty-state .em{ font-size:38px; margin-bottom:10px; font-family:'Batang',serif; color:var(--line); }
+  .loading{ text-align:center; padding:40px; color:var(--muted-l); font-size:13px; }
+
+  /* lightbox */
+  .lightbox{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(20,17,14,.86);
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .lightbox.show{ display:flex; }
+  .lightbox-inner{
+    background:var(--ink);
+    border-radius:18px;
+    max-width:640px;
+    width:100%;
+    max-height:90vh;
+    overflow:auto;
+    position:relative;
+  }
+  .lightbox-close{
+    position:absolute; top:10px; right:10px;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,.14); color:#fff;
+    border:none; font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    z-index:2;
+  }
+  .lightbox-img{ width:100%; display:block; }
+  .lightbox-info{ padding:18px 20px 22px; }
+  .lightbox-idiom{ font-size:20px; font-weight:700; color:var(--gold); margin-bottom:6px; }
+  .lightbox-author{ font-size:12.5px; color:#B9B2A9; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; }
+  .lightbox-meaning{ font-size:14.5px; line-height:1.75; color:#EDEAE5; white-space:pre-line; }
+
+  footer{ text-align:center; color:var(--muted-l); font-size:12.5px; margin-top:34px; }
+
+  @media (max-width:480px){
+    .gallery-grid{ grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="kicker">Hanja Puzzle Lab · 인생 사자성어</span>
+    <h1 class="hanja">📜 나의 인생 사자성어<br>포스터</h1>
+    <p class="subtitle">내 삶을 대표하는 사자성어를 하나 골라 포스터를 만들고,<br>친구들이 만든 작품도 함께 구경해보세요.</p>
+  </div>
+
+  <div class="storage-banner" id="storageBanner"></div>
+
+  <div class="card">
+    <h2>✏️ 활동 방법</h2>
+    <p>내가 살아가고 싶은 모습, 마음에 새기고 싶은 다짐을 담은 <strong>사자성어 하나</strong>를 골라보세요.</p>
+    <p>종이나 태블릿에 그 사자성어와 뜻, 내가 고른 이유가 드러나는 <strong>포스터</strong>를 자유롭게 꾸민 뒤, 사진을 찍어 올려주세요.</p>
+    <p class="note">그림, 손글씨, 색칠 등 표현 방법은 자유예요. 완성했으면 아래에서 사진으로 남겨보세요!</p>
+  </div>
+
+  <div class="card">
+    <h2>📖 힌트 사자성어</h2>
+    <p class="note" style="margin-bottom:12px;">눌러서 아래 입력칸에 바로 채워 넣을 수 있어요. 물론 목록에 없는 사자성어를 골라도 좋아요.</p>
+    <div class="chips" id="idiomChips"></div>
+  </div>
+
+  <div class="card">
+    <h2>🖼️ 선생님의 예시</h2>
+    <div class="example">
+      <div class="ex-idiom hanja">初志一貫<span class="sub">초지일관</span></div>
+      <div class="ex-body">
+        <div class="who">선생님의 인생 사자성어</div>
+        <div class="ex-text">처음 세운 뜻을 끝까지 밀고 나간다는 뜻이에요. 새로운 것을 배우다 힘들어도 처음 시작할 때의 마음을 잊지 않고 끝까지 해내는 사람이 되고 싶어서 골랐어요. 여러분도 자신만의 이유를 담아 포스터를 완성해보세요.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔗 구글 시트 연동</h2>
+    <p class="note" style="margin-bottom:12px;">선생님이 구글 시트 주소를 연결하면, 반 전체가 같은 갤러리에서 포스터를 올리고 볼 수 있어요. 아직 연결 전이라면 이 기기에만 임시로 저장돼요.</p>
+    <button class="connect-toggle" id="connectToggle">
+      <span>⚙️ 연동 설정</span>
+      <span id="connectStatus" style="font-weight:600; font-size:12.5px; color:var(--muted);">미연동</span>
+    </button>
+    <div class="connect-panel" id="connectPanel">
+      <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/..../exec" />
+      <div class="row-btns">
+        <button class="btn btn-dark" id="saveConnect">저장</button>
+        <button class="btn btn-ghost" id="clearConnect">연동 해제</button>
+      </div>
+      <div class="msg-line" id="connectMsg"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🖌️ 나의 포스터 올리기</h2>
+    <label for="authorInput">이름 (또는 모둠)</label>
+    <input type="text" id="authorInput" maxlength="20" placeholder="예: 3반 김한문" />
+
+    <label for="idiomInput">나의 인생 사자성어</label>
+    <input type="text" id="idiomInput" maxlength="24" placeholder="예: 初志一貫 (초지일관)" />
+
+    <label for="meaningInput">고른 이유 / 뜻</label>
+    <textarea id="meaningInput" maxlength="300" placeholder="이 사자성어의 뜻과, 내가 이 말을 인생 사자성어로 고른 이유를 써보세요"></textarea>
+    <div class="counter"><span id="charCount">0</span>/300</div>
+
+    <label>포스터 사진</label>
+    <div class="upload-box">
+      <label class="upload-label" for="imageInput">📷 사진 선택하기</label>
+      <input type="file" id="imageInput" accept="image/*" />
+      <div class="upload-hint">완성한 포스터를 사진으로 찍어 올려주세요. 올리면 자동으로 크기가 줄어들어요.</div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="포스터 미리보기" />
+        <div class="preview-status" id="previewStatus"></div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn" disabled>📮 포스터 제출하기</button>
+      <div class="form-status" id="formStatus"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="list-head">
+      <h2 style="margin:0;">🖼️ 친구들의 포스터 모아보기</h2>
+      <span class="gallery-count" id="galleryCount"></span>
+      <button class="btn-outline" id="refreshBtn">↻ 새로고침</button>
+    </div>
+    <div id="galleryArea"><div class="loading">불러오는 중...</div></div>
+  </div>
+
+  <footer>나의 인생 사자성어 포스터 · K-POP으로 배우는 한문</footer>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="" />
+    <div class="lightbox-info">
+      <div class="lightbox-idiom hanja" id="lightboxIdiom"></div>
+      <div class="lightbox-author" id="lightboxAuthor"></div>
+      <div class="lightbox-meaning" id="lightboxMeaning"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const IDIOM_BANK = [
+    ['自强不息','자강불식','스스로 힘써 쉬지 않음'],
+    ['愚公移山','우공이산','꾸준히 하면 큰 일도 해낼 수 있음'],
+    ['大器晩成','대기만성','큰 그릇은 늦게 이루어짐'],
+    ['塞翁之馬','새옹지마','인생의 화와 복은 알 수 없음'],
+    ['轉禍爲福','전화위복','화가 바뀌어 오히려 복이 됨'],
+    ['日新又日新','일신우일신','날마다 새롭게 발전함'],
+    ['溫故知新','온고지신','옛것을 익혀 새것을 앎'],
+    ['螢雪之功','형설지공','고생하며 부지런히 학문을 닦음'],
+    ['初志一貫','초지일관','처음 세운 뜻을 끝까지 지킴'],
+    ['有備無患','유비무환','미리 준비하면 근심이 없음'],
+    ['日就月將','일취월장','나날이 다달이 발전함'],
+    ['盡人事待天命','진인사대천명','최선을 다하고 결과를 기다림'],
+    ['水滴穿石','수적천석','작은 노력도 쌓이면 큰 일을 이룸'],
+    ['磨斧作針','마부작침','도끼를 갈아 바늘을 만듦, 끈기'],
+    ['靑出於藍','청출어람','제자가 스승보다 나아짐']
+  ];
+
+  const chipsHtml = IDIOM_BANK.map(([h,s,m]) =>
+    `<span class="chip" data-hanja="${h}" data-sound="${s}">${h}<small>${s}</small></span>`
+  ).join('');
+  $('idiomChips').innerHTML = chipsHtml;
+  $('idiomChips').addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    $('idiomInput').value = `${chip.dataset.hanja} (${chip.dataset.sound})`;
+    updateSubmitState();
+  });
+
+  // ---- storage layer (Sheets -> window.storage -> localStorage) ----
+  const SHEET_URL_KEY = 'life_idiom_sheet_url';
+  const DEFAULT_SHEET_URL = ''; // 선생님이 구글 시트/앱스 스크립트를 배포한 뒤 이 값을 채우거나, 아래 연동 설정에서 주소를 저장하세요.
+  function getSheetUrl(){
+    try{ return (window.localStorage.getItem(SHEET_URL_KEY) || '').trim() || DEFAULT_SHEET_URL; }
+    catch(e){ return DEFAULT_SHEET_URL; }
+  }
+  let SHEET_URL = getSheetUrl();
+  const CLOUD = (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function');
+  const LOCAL_KEY = 'life_idiom_poster_store_v1';
+
+  function localReadAll(){
+    try{ const raw = window.localStorage.getItem(LOCAL_KEY); return raw ? JSON.parse(raw) : {}; }
+    catch(e){ return {}; }
+  }
+  function localWriteAll(obj){
+    try{ window.localStorage.setItem(LOCAL_KEY, JSON.stringify(obj)); return true; }
+    catch(e){ return false; }
+  }
+
+  async function sheetSave(record){
+    const res = await fetch(SHEET_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify(record)
+    });
+    if(!res.ok) throw new Error('sheet save failed');
+    const data = await res.json();
+    if(!data || data.ok !== true) throw new Error('sheet save rejected');
+    return true;
+  }
+  async function sheetListAll(){
+    const res = await fetch(SHEET_URL, { method:'GET' });
+    if(!res.ok) throw new Error('sheet list failed');
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  const Store = {
+    async save(id, record){
+      if(SHEET_URL) return await sheetSave(record);
+      if(CLOUD) return await window.storage.set('poster:'+id, JSON.stringify(record), true);
+      const all = localReadAll();
+      all[id] = record;
+      return localWriteAll(all);
+    },
+    async listAll(){
+      if(SHEET_URL) return await sheetListAll();
+      if(CLOUD){
+        const listResult = await window.storage.list('poster:', true);
+        const keys = (listResult && listResult.keys) ? listResult.keys : [];
+        const records = [];
+        for(const k of keys){
+          try{
+            const r = await window.storage.get(k, true);
+            if(r && r.value) records.push(JSON.parse(r.value));
+          } catch(e){ /* skip broken entry */ }
+        }
+        return records;
+      }
+      const all = localReadAll();
+      return Object.values(all);
+    }
+  };
+
+  function initStorageBanner(){
+    const banner = $('storageBanner');
+    if(SHEET_URL){
+      banner.classList.add('cloud');
+      banner.innerHTML = '<span class="dot"></span><span><b>구글 시트와 연동됨</b> — 이 주소를 사용하는 모두가 같은 갤러리에 포스터를 올리고 볼 수 있어요. 새로고침을 누르면 친구가 올린 포스터도 바로 보여요.</span>';
+    } else if(CLOUD){
+      banner.classList.add('cloud');
+      banner.innerHTML = '<span class="dot"></span><span><b>우리 반과 공유되는 저장소</b>를 사용하고 있어요. 이 화면에 접속한 모두가 같은 포스터 갤러리를 보게 돼요.</span>';
+    } else {
+      banner.innerHTML = '<span class="dot"></span><span><b>이 기기(브라우저)에만 저장</b>되는 모드예요. 반 전체와 공유하려면 위쪽 &lsquo;⚙️ 연동 설정&rsquo;에서 선생님이 배포한 구글 시트 주소를 넣어주세요.</span>';
+    }
+  }
+
+  // ---- connect settings ----
+  const elConnectToggle = $('connectToggle');
+  const elConnectPanel = $('connectPanel');
+  const scriptUrlInput = $('scriptUrl');
+  const elConnectStatus = $('connectStatus');
+  const elConnectMsg = $('connectMsg');
+
+  function refreshConnectUI(){
+    scriptUrlInput.value = SHEET_URL;
+    if(SHEET_URL){
+      elConnectStatus.textContent = '연동됨';
+      elConnectStatus.style.color = '#2e7d4f';
+    } else {
+      elConnectStatus.textContent = '미연동';
+      elConnectStatus.style.color = 'var(--muted)';
+    }
+  }
+  elConnectToggle.addEventListener('click', () => elConnectPanel.classList.toggle('open'));
+
+  function isValidExecUrl(url){
+    return /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\/?$/.test(url.trim());
+  }
+
+  $('saveConnect').addEventListener('click', () => {
+    const val = scriptUrlInput.value.trim();
+    if(!val){
+      elConnectMsg.textContent = '주소를 입력해주세요.';
+      elConnectMsg.className = 'msg-line err';
+      return;
+    }
+    if(!isValidExecUrl(val)){
+      elConnectMsg.textContent = '올바른 주소가 아니에요. script.google.com/macros/s/...../exec 형태인지 확인해주세요.';
+      elConnectMsg.className = 'msg-line err';
+      return;
+    }
+    try{ window.localStorage.setItem(SHEET_URL_KEY, val); } catch(e){}
+    SHEET_URL = val;
+    elConnectMsg.textContent = '저장했어요! 이제 구글 시트와 연동돼요.';
+    elConnectMsg.className = 'msg-line ok';
+    refreshConnectUI();
+    initStorageBanner();
+    loadGallery();
+  });
+
+  $('clearConnect').addEventListener('click', () => {
+    try{ window.localStorage.removeItem(SHEET_URL_KEY); } catch(e){}
+    SHEET_URL = DEFAULT_SHEET_URL;
+    elConnectMsg.textContent = '연동을 해제했어요.';
+    elConnectMsg.className = 'msg-line';
+    refreshConnectUI();
+    initStorageBanner();
+    loadGallery();
+  });
+
+  refreshConnectUI();
+
+  // ---- form state ----
+  let posterImageDataUrl = null;
+
+  const elMeaning = $('meaningInput');
+  const elCharCount = $('charCount');
+  elMeaning.addEventListener('input', () => {
+    elCharCount.textContent = elMeaning.value.length;
+    updateSubmitState();
+  });
+  $('authorInput').addEventListener('input', updateSubmitState);
+  $('idiomInput').addEventListener('input', updateSubmitState);
+
+  function resizeImage(file, maxDim, quality){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else if(h >= w && h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject(new Error('이미지를 읽을 수 없어요.'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('파일을 읽을 수 없어요.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  $('imageInput').addEventListener('change', async () => {
+    const file = $('imageInput').files[0];
+    if(!file) return;
+    const previewWrap = $('previewWrap');
+    const previewStatus = $('previewStatus');
+    previewWrap.classList.add('show');
+    previewStatus.textContent = '이미지 처리 중...';
+    try{
+      const dataUrl = await resizeImage(file, 1000, 0.82);
+      posterImageDataUrl = dataUrl;
+      $('previewImg').src = dataUrl;
+      const kb = Math.round(dataUrl.length * 0.75 / 1024);
+      previewStatus.textContent = `준비 완료 (약 ${kb}KB로 줄였어요)`;
+    } catch(err){
+      posterImageDataUrl = null;
+      previewStatus.textContent = '이미지를 처리하지 못했어요. 다른 사진으로 다시 시도해주세요.';
+    }
+    updateSubmitState();
+  });
+
+  function updateSubmitState(){
+    const author = $('authorInput').value.trim();
+    const idiom = $('idiomInput').value.trim();
+    const meaning = elMeaning.value.trim();
+    const ok = author && idiom && meaning && posterImageDataUrl;
+    $('submitBtn').disabled = !ok;
+  }
+
+  function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+  $('submitBtn').addEventListener('click', async () => {
+    const author = $('authorInput').value.trim();
+    const idiom = $('idiomInput').value.trim();
+    const meaning = elMeaning.value.trim();
+    if(!author || !idiom || !meaning || !posterImageDataUrl) return;
+
+    const btn = $('submitBtn');
+    const elFormStatus = $('formStatus');
+    btn.disabled = true;
+    elFormStatus.textContent = '제출 중...';
+    elFormStatus.className = 'form-status';
+
+    const record = {
+      id: uid(),
+      author, idiom, meaning,
+      imageData: posterImageDataUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    try{
+      const ok = await Store.save(record.id, record);
+      if(!ok) throw new Error('save failed');
+      elFormStatus.textContent = '포스터를 올렸어요! 아래 갤러리에서 확인해보세요. 🎉';
+      elFormStatus.className = 'form-status ok';
+      $('meaningInput').value = '';
+      elCharCount.textContent = '0';
+      $('idiomInput').value = '';
+      $('imageInput').value = '';
+      posterImageDataUrl = null;
+      $('previewWrap').classList.remove('show');
+      loadGallery();
+    } catch(err){
+      elFormStatus.textContent = SHEET_URL
+        ? '저장에 실패했어요. 인터넷 연결이나 구글 시트 연동 주소를 확인하고 다시 시도해주세요.'
+        : '이 브라우저에 저장하지 못했어요. 시크릿(비공개) 모드이거나 저장 공간이 꽉 찼을 수 있어요.';
+      elFormStatus.className = 'form-status err';
+    } finally {
+      updateSubmitState();
+    }
+  });
+
+  // ---- gallery ----
+  function escapeHtml(str){
+    if(!str) return '';
+    return str.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  let currentRecords = [];
+
+  async function loadGallery(){
+    const area = $('galleryArea');
+    area.innerHTML = '<div class="loading">불러오는 중...</div>';
+    $('galleryCount').textContent = '';
+    try{
+      const records = await Store.listAll();
+      if(!Array.isArray(records) || records.length === 0){
+        area.innerHTML = '<div class="empty-state"><div class="em hanja">畫</div>아직 올라온 포스터가 없어요.<br>첫 번째 포스터를 올려보세요!</div>';
+        $('galleryCount').textContent = '0개';
+        return;
+      }
+      records.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+      currentRecords = records;
+      $('galleryCount').textContent = records.length + '개';
+      renderGallery(records);
+    } catch(err){
+      area.innerHTML = '<div class="empty-state">불러오지 못했어요. 새로고침을 눌러 다시 시도해주세요.</div>';
+      $('galleryCount').textContent = '오류';
+    }
+  }
+
+  function renderGallery(records){
+    const area = $('galleryArea');
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+    records.forEach((rec, i) => {
+      const src = rec.imageUrl || rec.imageData || '';
+      const card = document.createElement('div');
+      card.className = 'poster-card';
+      card.innerHTML = `
+        <img class="thumb" src="${src}" alt="${escapeHtml(rec.idiom)} 포스터" loading="lazy" />
+        <div class="info">
+          <div class="idiom hanja">${escapeHtml(rec.idiom)}</div>
+          <div class="author">${escapeHtml(rec.author || '익명')}</div>
+        </div>`;
+      card.addEventListener('click', () => openLightbox(i));
+      grid.appendChild(card);
+    });
+    area.innerHTML = '';
+    area.appendChild(grid);
+  }
+
+  function openLightbox(i){
+    const rec = currentRecords[i];
+    if(!rec) return;
+    $('lightboxImg').src = rec.imageUrl || rec.imageData || '';
+    $('lightboxIdiom').textContent = rec.idiom || '';
+    $('lightboxAuthor').textContent = rec.author || '익명';
+    $('lightboxMeaning').textContent = rec.meaning || '';
+    $('lightbox').classList.add('show');
+  }
+  function closeLightbox(){ $('lightbox').classList.remove('show'); }
+  $('lightboxClose').addEventListener('click', closeLightbox);
+  $('lightbox').addEventListener('click', (e) => { if(e.target.id === 'lightbox') closeLightbox(); });
+
+  $('refreshBtn').addEventListener('click', loadGallery);
+
+  initStorageBanner();
+  updateSubmitState();
+  loadGallery();
+</script>
+</body>
+</html>
