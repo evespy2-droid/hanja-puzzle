@@ -328,7 +328,7 @@
 
   <div class="card">
     <h2>🔗 구글 시트 연동</h2>
-    <p class="note" style="margin-bottom:12px;">선생님이 구글 시트 주소를 연결하면, 반 전체가 같은 갤러리에서 포스터를 올리고 볼 수 있어요. 아직 연결 전이라면 이 기기에만 임시로 저장돼요.</p>
+    <p class="note" style="margin-bottom:12px;">우리 반 구글 시트에 이미 연결되어 있어요! 별도로 설정하지 않아도 바로 포스터를 올리고 볼 수 있어요. (선생님만 아래에서 주소를 확인/변경할 수 있어요)</p>
     <button class="connect-toggle" id="connectToggle">
       <span>⚙️ 연동 설정</span>
       <span id="connectStatus" style="font-weight:600; font-size:12.5px; color:var(--muted);">미연동</span>
@@ -453,7 +453,8 @@
 
   // ---- storage layer (Sheets -> window.storage -> localStorage) ----
   const SHEET_URL_KEY = 'life_idiom_sheet_url';
-  const DEFAULT_SHEET_URL = ''; // 선생님이 구글 시트/앱스 스크립트를 배포한 뒤 이 값을 채우거나, 아래 연동 설정에서 주소를 저장하세요.
+  // 우리 반 구글 시트에 이미 연결되어 있습니다. 학생들은 따로 설정하지 않아도 바로 사용할 수 있어요.
+  const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyd6d_yzjMaGbcO7-7HEiRFv5x8SaajexsiC0TpcMvYIeCsaQFe1r__pdXn-jLxROVaMw/exec';
   function getSheetUrl(){
     try{ return (window.localStorage.getItem(SHEET_URL_KEY) || '').trim() || DEFAULT_SHEET_URL; }
     catch(e){ return DEFAULT_SHEET_URL; }
