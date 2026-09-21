@@ -137,6 +137,19 @@
   .msg-line.ok{ color:#2e7d4f; }
   .msg-line.err{ color:#c94f4f; }
 
+  .verified-chip{
+    background:#EAF5EE;
+    border:1px solid #BFE0CB;
+    color:#215c37;
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 14px;
+    border-radius:12px;
+    margin-top:4px;
+    margin-bottom:16px;
+  }
+  .verified-chip a{ color:#215c37; font-weight:700; }
+
   .storage-banner{ display:flex; align-items:flex-start; gap:10px; background:var(--offwhite);
     border-radius:12px; padding:12px 14px; font-size:12.5px; color:var(--muted); margin-bottom:18px; line-height:1.55; border:1px solid var(--line);}
   .storage-banner .dot{ width:8px;height:8px;border-radius:50%; flex:none; margin-top:4px; background:var(--gold); }
@@ -302,12 +315,6 @@
   </div>
 
   <div class="card">
-    <h2>🖼️ 선배들이 만든 포스터 예시</h2>
-    <p class="note" style="margin-bottom:14px;">먼저 이런 활동을 했던 선배들의 작품이에요. 좋아하는 사진에 사자성어와 나만의 글귀를 더하는 것도 좋은 방법이에요. 눌러서 크게 볼 수 있어요.</p>
-    <div class="gallery-grid" id="exampleGrid"></div>
-  </div>
-
-  <div class="card">
     <h2>🔗 구글 시트 연동</h2>
     <p class="note" style="margin-bottom:12px;">선생님이 구글 시트 주소를 연결하면, 반 전체가 같은 갤러리에서 포스터를 올리고 볼 수 있어요. 아직 연결 전이라면 이 기기에만 임시로 저장돼요.</p>
     <button class="connect-toggle" id="connectToggle">
@@ -326,30 +333,48 @@
 
   <div class="card">
     <h2>🖌️ 나의 포스터 올리기</h2>
-    <label for="authorInput">이름 (또는 모둠)</label>
-    <input type="text" id="authorInput" maxlength="20" placeholder="예: 3반 김한문" />
 
-    <label for="idiomInput">나의 인생 사자성어</label>
-    <input type="text" id="idiomInput" maxlength="24" placeholder="예: 初志一貫 (초지일관)" />
-
-    <label for="meaningInput">고른 이유 / 뜻</label>
-    <textarea id="meaningInput" maxlength="300" placeholder="이 사자성어의 뜻과, 내가 이 말을 인생 사자성어로 고른 이유를 써보세요"></textarea>
-    <div class="counter"><span id="charCount">0</span>/300</div>
-
-    <label>포스터 사진</label>
-    <div class="upload-box">
-      <label class="upload-label" for="imageInput">📷 사진 선택하기</label>
-      <input type="file" id="imageInput" accept="image/*" />
-      <div class="upload-hint">완성한 포스터를 사진으로 찍어 올려주세요. 올리면 자동으로 크기가 줄어들어요.</div>
-      <div class="preview-wrap" id="previewWrap">
-        <img id="previewImg" src="" alt="포스터 미리보기" />
-        <div class="preview-status" id="previewStatus"></div>
+    <div id="codeModeBox">
+      <label for="codeInput">학생 인증 코드</label>
+      <input type="text" id="codeInput" maxlength="20" placeholder="선생님이 알려주신 코드를 입력하세요" />
+      <div class="row-btns" style="margin-bottom:6px;">
+        <button class="btn btn-dark" id="verifyCodeBtn">확인</button>
+      </div>
+      <div class="msg-line" id="codeMsg"></div>
+      <div class="verified-chip" id="verifiedChip" style="display:none;">
+        ✅ <b><span id="verifiedName"></span></b>님으로 확인되었어요 · <a href="#" id="changeCodeLink">다시 입력</a>
       </div>
     </div>
 
-    <div class="submit-wrap">
-      <button class="submit-btn" id="submitBtn" disabled>📮 포스터 제출하기</button>
-      <div class="form-status" id="formStatus"></div>
+    <div id="localNameBox" style="display:none;">
+      <label for="authorInput">이름 (또는 모둠)</label>
+      <input type="text" id="authorInput" maxlength="20" placeholder="예: 3반 김한문" />
+      <p class="note" style="margin:-8px 0 16px;">아직 구글 시트 연동 전이라 이 기기에만 저장되는 테스트 모드예요. 연동 후에는 선생님이 나눠준 코드로 이름이 자동으로 확인돼요.</p>
+    </div>
+
+    <div id="posterFields" style="display:none;">
+      <label for="idiomInput">나의 인생 사자성어</label>
+      <input type="text" id="idiomInput" maxlength="24" placeholder="예: 初志一貫 (초지일관)" />
+
+      <label for="meaningInput">고른 이유 / 뜻</label>
+      <textarea id="meaningInput" maxlength="300" placeholder="이 사자성어의 뜻과, 내가 이 말을 인생 사자성어로 고른 이유를 써보세요"></textarea>
+      <div class="counter"><span id="charCount">0</span>/300</div>
+
+      <label>포스터 사진</label>
+      <div class="upload-box">
+        <label class="upload-label" for="imageInput">📷 사진 선택하기</label>
+        <input type="file" id="imageInput" accept="image/*" />
+        <div class="upload-hint">완성한 포스터를 사진으로 찍어 올려주세요. 올리면 자동으로 크기가 줄어들어요.</div>
+        <div class="preview-wrap" id="previewWrap">
+          <img id="previewImg" src="" alt="포스터 미리보기" />
+          <div class="preview-status" id="previewStatus"></div>
+        </div>
+      </div>
+
+      <div class="submit-wrap">
+        <button class="submit-btn" id="submitBtn" disabled>📮 포스터 제출하기</button>
+        <div class="form-status" id="formStatus"></div>
+      </div>
     </div>
   </div>
 
@@ -368,7 +393,7 @@
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
     <button class="lightbox-close" id="lightboxClose">✕</button>
-    <img class="lightbox-img" id="lightboxImg" src="" alt="" />
+    <img class="lightbox-img" id="lightboxImg" src="" alt="" draggable="false" oncontextmenu="return false" />
     <div class="lightbox-info">
       <div class="lightbox-idiom hanja" id="lightboxIdiom"></div>
       <div class="lightbox-author" id="lightboxAuthor"></div>
@@ -397,45 +422,6 @@
     ['磨斧作針','마부작침','도끼를 갈아 바늘을 만듦, 끈기'],
     ['靑出於藍','청출어람','제자가 스승보다 나아짐']
   ];
-
-  const EXAMPLE_POSTERS = [
-    ['posters/example01.jpg','인과응보'],
-    ['posters/example02.jpg','대기만성'],
-    ['posters/example03.jpg','고진감래'],
-    ['posters/example04.jpg','고진감래'],
-    ['posters/example05.jpg','낭중지추'],
-    ['posters/example06.jpg','학수고대'],
-    ['posters/example07.jpg','대기만성'],
-    ['posters/example08.jpg','절차탁마'],
-    ['posters/example09.jpg','파죽지세'],
-    ['posters/example10.jpg','고진감래'],
-    ['posters/example11.jpg','십시일반'],
-    ['posters/example12.jpg','대기만성'],
-    ['posters/example13.jpg','형설지공'],
-    ['posters/example14.jpg','일취월장'],
-    ['posters/example15.jpg','인자무적'],
-    ['posters/example16.jpg','양두구육']
-  ];
-
-  function renderExampleGrid(){
-    const grid = $('exampleGrid');
-    grid.innerHTML = EXAMPLE_POSTERS.map(([src, idiom]) => `
-      <div class="poster-card" data-src="${src}" data-idiom="${idiom}">
-        <img class="thumb" src="${src}" alt="${idiom} 포스터 예시" loading="lazy" />
-        <div class="info">
-          <div class="idiom hanja">${idiom}</div>
-          <div class="author">선배 작품</div>
-        </div>
-      </div>`).join('');
-    grid.querySelectorAll('.poster-card').forEach(card => {
-      card.addEventListener('click', () => openLightbox({
-        idiom: card.dataset.idiom,
-        author: '선배 작품 · 예시',
-        meaning: '',
-        src: card.dataset.src
-      }));
-    });
-  }
 
   const chipsHtml = IDIOM_BANK.map(([h,s,m]) =>
     `<span class="chip" data-hanja="${h}" data-sound="${s}">${h}<small>${s}</small></span>`
@@ -567,6 +553,7 @@
     elConnectMsg.className = 'msg-line ok';
     refreshConnectUI();
     initStorageBanner();
+    initAuthMode();
     loadGallery();
   });
 
@@ -577,10 +564,78 @@
     elConnectMsg.className = 'msg-line';
     refreshConnectUI();
     initStorageBanner();
+    initAuthMode();
     loadGallery();
   });
 
   refreshConnectUI();
+
+  // ---- student code verification (prevents submitting under someone else's name) ----
+  let verifiedCode = null;
+  let verifiedAuthor = null;
+
+  function initAuthMode(){
+    if(SHEET_URL){
+      $('codeModeBox').style.display = 'block';
+      $('localNameBox').style.display = 'none';
+      $('posterFields').style.display = verifiedAuthor ? 'block' : 'none';
+    } else {
+      $('codeModeBox').style.display = 'none';
+      $('localNameBox').style.display = 'block';
+      $('posterFields').style.display = 'block';
+    }
+  }
+
+  function getAuthor(){
+    return SHEET_URL ? verifiedAuthor : $('authorInput').value.trim();
+  }
+
+  async function verifyCode(){
+    const code = $('codeInput').value.trim();
+    const msg = $('codeMsg');
+    if(!code){
+      msg.textContent = '코드를 입력해주세요.';
+      msg.className = 'msg-line err';
+      return;
+    }
+    msg.textContent = '확인 중...';
+    msg.className = 'msg-line';
+    try{
+      const res = await fetch(SHEET_URL + '?action=verify&code=' + encodeURIComponent(code));
+      const data = await res.json();
+      if(data && data.ok){
+        verifiedCode = code;
+        verifiedAuthor = data.name;
+        $('verifiedName').textContent = data.name;
+        $('verifiedChip').style.display = 'block';
+        $('codeInput').disabled = true;
+        $('verifyCodeBtn').disabled = true;
+        $('posterFields').style.display = 'block';
+        msg.textContent = '';
+      } else {
+        msg.textContent = (data && data.error) || '등록되지 않은 코드예요. 선생님께 코드를 다시 확인해주세요.';
+        msg.className = 'msg-line err';
+      }
+    } catch(err){
+      msg.textContent = '확인하지 못했어요. 인터넷 연결을 확인하고 다시 시도해주세요.';
+      msg.className = 'msg-line err';
+    }
+    updateSubmitState();
+  }
+
+  $('verifyCodeBtn').addEventListener('click', verifyCode);
+  $('changeCodeLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    verifiedCode = null;
+    verifiedAuthor = null;
+    $('codeInput').value = '';
+    $('codeInput').disabled = false;
+    $('verifyCodeBtn').disabled = false;
+    $('verifiedChip').style.display = 'none';
+    $('posterFields').style.display = 'none';
+    $('codeMsg').textContent = '';
+    updateSubmitState();
+  });
 
   // ---- form state ----
   let posterImageDataUrl = null;
@@ -637,7 +692,7 @@
   });
 
   function updateSubmitState(){
-    const author = $('authorInput').value.trim();
+    const author = getAuthor();
     const idiom = $('idiomInput').value.trim();
     const meaning = elMeaning.value.trim();
     const ok = author && idiom && meaning && posterImageDataUrl;
@@ -647,7 +702,7 @@
   function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
   $('submitBtn').addEventListener('click', async () => {
-    const author = $('authorInput').value.trim();
+    const author = getAuthor();
     const idiom = $('idiomInput').value.trim();
     const meaning = elMeaning.value.trim();
     if(!author || !idiom || !meaning || !posterImageDataUrl) return;
@@ -664,6 +719,7 @@
       imageData: posterImageDataUrl,
       createdAt: new Date().toISOString()
     };
+    if(SHEET_URL) record.code = verifiedCode;
 
     try{
       const ok = await Store.save(record.id, record);
@@ -722,7 +778,7 @@
       const card = document.createElement('div');
       card.className = 'poster-card';
       card.innerHTML = `
-        <img class="thumb" src="${src}" alt="${escapeHtml(rec.idiom)} 포스터" loading="lazy" />
+        <img class="thumb" src="${src}" alt="${escapeHtml(rec.idiom)} 포스터" loading="lazy" draggable="false" oncontextmenu="return false" />
         <div class="info">
           <div class="idiom hanja">${escapeHtml(rec.idiom)}</div>
           <div class="author">${escapeHtml(rec.author || '익명')}</div>
@@ -751,8 +807,8 @@
   $('refreshBtn').addEventListener('click', loadGallery);
 
   initStorageBanner();
+  initAuthMode();
   updateSubmitState();
-  renderExampleGrid();
   loadGallery();
 </script>
 </body>
