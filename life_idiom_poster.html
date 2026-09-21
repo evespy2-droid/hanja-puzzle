@@ -93,23 +93,6 @@
   .chip:hover{ border-color:var(--gold); }
   .chip small{ font-weight:500; margin-left:4px; opacity:.85; }
 
-  /* teacher example */
-  .example{
-    background:var(--ink);
-    color:#fff;
-    border-radius:14px;
-    padding:18px 20px;
-    display:flex;
-    gap:16px;
-    align-items:flex-start;
-    flex-wrap:wrap;
-  }
-  .example .ex-idiom{ font-size:26px; font-weight:700; color:var(--gold); flex:none; }
-  .example .ex-idiom .sub{ display:block; font-size:11.5px; color:#CFC9C1; font-weight:400; margin-top:4px; }
-  .example .ex-body{ flex:1; min-width:180px; }
-  .example .who{ font-size:12px; color:#B9B2A9; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:.06em; }
-  .example .ex-text{ font-size:14.5px; line-height:1.7; color:#EDEAE5; }
-
   /* connect settings */
   .connect-toggle{
     width:100%;
@@ -319,14 +302,9 @@
   </div>
 
   <div class="card">
-    <h2>🖼️ 선생님의 예시</h2>
-    <div class="example">
-      <div class="ex-idiom hanja">初志一貫<span class="sub">초지일관</span></div>
-      <div class="ex-body">
-        <div class="who">선생님의 인생 사자성어</div>
-        <div class="ex-text">처음 세운 뜻을 끝까지 밀고 나간다는 뜻이에요. 새로운 것을 배우다 힘들어도 처음 시작할 때의 마음을 잊지 않고 끝까지 해내는 사람이 되고 싶어서 골랐어요. 여러분도 자신만의 이유를 담아 포스터를 완성해보세요.</div>
-      </div>
-    </div>
+    <h2>🖼️ 선배들이 만든 포스터 예시</h2>
+    <p class="note" style="margin-bottom:14px;">먼저 이런 활동을 했던 선배들의 작품이에요. 좋아하는 사진에 사자성어와 나만의 글귀를 더하는 것도 좋은 방법이에요. 눌러서 크게 볼 수 있어요.</p>
+    <div class="gallery-grid" id="exampleGrid"></div>
   </div>
 
   <div class="card">
@@ -419,6 +397,45 @@
     ['磨斧作針','마부작침','도끼를 갈아 바늘을 만듦, 끈기'],
     ['靑出於藍','청출어람','제자가 스승보다 나아짐']
   ];
+
+  const EXAMPLE_POSTERS = [
+    ['posters/example01.jpg','인과응보'],
+    ['posters/example02.jpg','대기만성'],
+    ['posters/example03.jpg','고진감래'],
+    ['posters/example04.jpg','고진감래'],
+    ['posters/example05.jpg','낭중지추'],
+    ['posters/example06.jpg','학수고대'],
+    ['posters/example07.jpg','대기만성'],
+    ['posters/example08.jpg','절차탁마'],
+    ['posters/example09.jpg','파죽지세'],
+    ['posters/example10.jpg','고진감래'],
+    ['posters/example11.jpg','십시일반'],
+    ['posters/example12.jpg','대기만성'],
+    ['posters/example13.jpg','형설지공'],
+    ['posters/example14.jpg','일취월장'],
+    ['posters/example15.jpg','인자무적'],
+    ['posters/example16.jpg','양두구육']
+  ];
+
+  function renderExampleGrid(){
+    const grid = $('exampleGrid');
+    grid.innerHTML = EXAMPLE_POSTERS.map(([src, idiom]) => `
+      <div class="poster-card" data-src="${src}" data-idiom="${idiom}">
+        <img class="thumb" src="${src}" alt="${idiom} 포스터 예시" loading="lazy" />
+        <div class="info">
+          <div class="idiom hanja">${idiom}</div>
+          <div class="author">선배 작품</div>
+        </div>
+      </div>`).join('');
+    grid.querySelectorAll('.poster-card').forEach(card => {
+      card.addEventListener('click', () => openLightbox({
+        idiom: card.dataset.idiom,
+        author: '선배 작품 · 예시',
+        meaning: '',
+        src: card.dataset.src
+      }));
+    });
+  }
 
   const chipsHtml = IDIOM_BANK.map(([h,s,m]) =>
     `<span class="chip" data-hanja="${h}" data-sound="${s}">${h}<small>${s}</small></span>`
@@ -676,8 +693,6 @@
     return str.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  let currentRecords = [];
-
   async function loadGallery(){
     const area = $('galleryArea');
     area.innerHTML = '<div class="loading">불러오는 중...</div>';
@@ -690,7 +705,6 @@
         return;
       }
       records.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
-      currentRecords = records;
       $('galleryCount').textContent = records.length + '개';
       renderGallery(records);
     } catch(err){
@@ -703,7 +717,7 @@
     const area = $('galleryArea');
     const grid = document.createElement('div');
     grid.className = 'gallery-grid';
-    records.forEach((rec, i) => {
+    records.forEach((rec) => {
       const src = rec.imageUrl || rec.imageData || '';
       const card = document.createElement('div');
       card.className = 'poster-card';
@@ -713,17 +727,18 @@
           <div class="idiom hanja">${escapeHtml(rec.idiom)}</div>
           <div class="author">${escapeHtml(rec.author || '익명')}</div>
         </div>`;
-      card.addEventListener('click', () => openLightbox(i));
+      card.addEventListener('click', () => openLightbox({
+        idiom: rec.idiom, author: rec.author, meaning: rec.meaning, src
+      }));
       grid.appendChild(card);
     });
     area.innerHTML = '';
     area.appendChild(grid);
   }
 
-  function openLightbox(i){
-    const rec = currentRecords[i];
+  function openLightbox(rec){
     if(!rec) return;
-    $('lightboxImg').src = rec.imageUrl || rec.imageData || '';
+    $('lightboxImg').src = rec.src || '';
     $('lightboxIdiom').textContent = rec.idiom || '';
     $('lightboxAuthor').textContent = rec.author || '익명';
     $('lightboxMeaning').textContent = rec.meaning || '';
@@ -737,6 +752,7 @@
 
   initStorageBanner();
   updateSubmitState();
+  renderExampleGrid();
   loadGallery();
 </script>
 </body>
