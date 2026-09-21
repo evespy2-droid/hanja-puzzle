@@ -454,7 +454,7 @@
   // ---- storage layer (Sheets -> window.storage -> localStorage) ----
   const SHEET_URL_KEY = 'life_idiom_sheet_url';
   // 우리 반 구글 시트에 이미 연결되어 있습니다. 학생들은 따로 설정하지 않아도 바로 사용할 수 있어요.
-  const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyd6d_yzjMaGbcO7-7HEiRFv5x8SaajexsiC0TpcMvYIeCsaQFe1r__pdXn-jLxROVaMw/exec';
+  const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyp-oSU1uKFHbInktfdH85GvKDU4tCUKK6kg7XsSSZ6KXORJaw-53351-brgs-E1yi75g/exec';
   function getSheetUrl(){
     try{ return (window.localStorage.getItem(SHEET_URL_KEY) || '').trim() || DEFAULT_SHEET_URL; }
     catch(e){ return DEFAULT_SHEET_URL; }
