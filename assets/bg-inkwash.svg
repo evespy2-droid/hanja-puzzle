@@ -1,78 +1,127 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1800" preserveAspectRatio="none">
   <defs>
     <radialGradient id="moon" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
     </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0.11
+                0 0 0 0 0.10
+                0 0 0 0 0.08
+                0 0 0 0.05 0"/>
+    </filter>
   </defs>
 
-  <!-- 은은한 달 -->
-  <circle cx="1000" cy="120" r="120" fill="url(#moon)"/>
+  <!-- 종이 결 (은은한 그레인) -->
+  <rect x="0" y="0" width="1200" height="1800" filter="url(#grain)"/>
 
-  <!-- 먼 산 (가장 옅음) -->
+  <!-- 은은한 달 -->
+  <circle cx="1010" cy="120" r="130" fill="url(#moon)"/>
+
+  <!-- 먼 산 -->
   <path d="M0,360 L0,300 C70,270 130,240 210,265 C290,290 330,205 410,230
            C490,255 545,300 625,270 C705,240 765,195 845,240
            C925,285 985,245 1065,275 C1130,300 1170,285 1200,305 L1200,360 Z"
-        fill="#C7C0AA" opacity="0.24"/>
+        fill="#8F7F5C" opacity="0.22"/>
 
   <!-- 중간 산 -->
   <path d="M0,480 L0,410 C60,375 125,355 205,388 C285,421 325,335 405,368
            C485,401 525,450 605,418 C685,386 745,335 825,378
            C905,421 965,388 1045,421 C1105,444 1165,430 1200,452 L1200,480 Z"
-        fill="#B3AA8E" opacity="0.22"/>
+        fill="#6E5F42" opacity="0.2"/>
 
-  <!-- 세 번째 능선 (조금 더 아래) -->
+  <!-- 굵은 붓질 (기운찬 사선, 갈필 텍스처) -->
+  <g opacity="0.5">
+    <path d="M-40,470 C160,410 320,610 560,540 C760,485 820,690 1060,620"
+          stroke="#1C1A16" stroke-width="34" fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M-40,485 C160,428 320,622 560,555 C760,502 820,702 1060,635"
+          stroke="#1C1A16" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.35"/>
+    <path d="M20,445 C200,405 300,530 480,500" stroke="#1C1A16" stroke-width="4" fill="none"
+          stroke-linecap="round" opacity="0.3" stroke-dasharray="2 10"/>
+  </g>
+
+  <!-- 먹 튀김 (스플래터) -->
+  <g fill="#1C1A16">
+    <circle cx="1085" cy="605" r="7" opacity="0.4"/>
+    <circle cx="1105" cy="640" r="4" opacity="0.35"/>
+    <circle cx="1120" cy="595" r="3" opacity="0.3"/>
+    <circle cx="1070" cy="650" r="2.5" opacity="0.3"/>
+    <circle cx="60" cy="460" r="5" opacity="0.35"/>
+    <circle cx="40" cy="495" r="3" opacity="0.3"/>
+    <circle cx="540" cy="525" r="4" opacity="0.3"/>
+    <circle cx="565" cy="560" r="2.5" opacity="0.28"/>
+  </g>
+
+  <!-- 매화 가지 -->
+  <g opacity="0.22" stroke="#8A422D" fill="none" stroke-linecap="round">
+    <path d="M980,560 C960,620 1000,660 970,730 C950,775 990,810 965,870" stroke-width="5"/>
+    <path d="M975,600 C1000,585 1030,595 1050,575" stroke-width="4"/>
+    <path d="M968,690 C945,675 915,680 895,660" stroke-width="4"/>
+    <path d="M968,760 C995,748 1020,755 1045,740" stroke-width="4"/>
+  </g>
+  <g opacity="0.28" fill="#B8362A">
+    <circle cx="1048" cy="573" r="7"/>
+    <circle cx="1028" cy="585" r="6"/>
+    <circle cx="893" cy="658" r="6"/>
+    <circle cx="913" cy="678" r="5"/>
+    <circle cx="1043" cy="738" r="6"/>
+    <circle cx="1022" cy="752" r="5"/>
+  </g>
+
+  <!-- 세 번째 능선 -->
   <path d="M0,600 L0,540 C90,515 170,545 260,520 C350,495 410,555 510,530
            C600,508 660,560 760,538 C850,518 920,555 1010,535
            C1080,520 1150,535 1200,548 L1200,600 Z"
-        fill="#A79C7D" opacity="0.16"/>
+        fill="#5C4F38" opacity="0.14"/>
 
-  <!-- 매화 가지 (오른쪽 상단~중단) -->
-  <g opacity="0.16" stroke="#8A422D" fill="none" stroke-linecap="round">
-    <path d="M980,520 C960,580 1000,620 970,690 C950,735 990,770 965,830" stroke-width="5"/>
-    <path d="M975,560 C1000,545 1030,555 1050,535" stroke-width="4"/>
-    <path d="M968,650 C945,635 915,640 895,620" stroke-width="4"/>
-    <path d="M968,720 C995,708 1020,715 1045,700" stroke-width="4"/>
+  <!-- 굵은 붓질 2 (반대 대각선, 아래쪽) -->
+  <g opacity="0.5">
+    <path d="M40,980 C260,900 420,1120 660,1040 C860,975 930,1180 1170,1100"
+          stroke="#1C1A16" stroke-width="30" fill="none" stroke-linecap="round" opacity="0.42"/>
+    <path d="M40,995 C260,918 420,1132 660,1055 C860,992 930,1192 1170,1115"
+          stroke="#1C1A16" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.3"/>
   </g>
-  <g opacity="0.22" fill="#AF5A41">
-    <circle cx="1048" cy="533" r="7"/>
-    <circle cx="1028" cy="545" r="6"/>
-    <circle cx="893" cy="618" r="6"/>
-    <circle cx="913" cy="638" r="5"/>
-    <circle cx="1043" cy="698" r="6"/>
-    <circle cx="1022" cy="712" r="5"/>
+  <g fill="#1C1A16">
+    <circle cx="1150" cy="1085" r="6" opacity="0.35"/>
+    <circle cx="1175" cy="1120" r="4" opacity="0.3"/>
+    <circle cx="1190" cy="1075" r="3" opacity="0.28"/>
+    <circle cx="65" cy="960" r="5" opacity="0.32"/>
+    <circle cx="90" cy="995" r="3" opacity="0.28"/>
   </g>
 
-  <!-- 붓 스침들 (여백을 고르게 채움) -->
-  <path d="M100,420 C220,375 250,500 390,460 C480,435 430,560 560,525"
-        stroke="#201E1B" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.06"/>
-  <path d="M760,220 C860,180 900,280 1020,240"
-        stroke="#201E1B" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.05"/>
-  <path d="M60,850 C170,815 210,910 330,875 C410,850 380,955 490,925"
-        stroke="#201E1B" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.06"/>
-  <path d="M700,900 C800,865 830,965 950,930 C1020,910 1000,995 1100,965"
-        stroke="#AF5A41" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.07"/>
-  <path d="M120,1080 C230,1045 265,1140 390,1105"
-        stroke="#201E1B" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.05"/>
   <path d="M760,1200 C860,1165 900,1260 1020,1225 C1090,1204 1060,1290 1160,1260"
-        stroke="#201E1B" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.055"/>
-  <path d="M80,1420 C190,1385 225,1480 350,1445"
-        stroke="#AF5A41" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.06"/>
+        stroke="#1C1A16" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.22"/>
+  <path d="M120,1300 C230,1265 265,1360 390,1325"
+        stroke="#B8362A" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.22"/>
 
-  <!-- 대나무 (하단 왼쪽, 두껍게) -->
-  <g opacity="0.16" stroke="#201E1B" fill="none" stroke-linecap="round">
-    <path d="M75,1800 C68,1670 96,1580 78,1470 C70,1400 92,1355 82,1290" stroke-width="9"/>
-    <path d="M120,1800 C117,1650 142,1560 128,1440 C121,1360 140,1315 132,1250" stroke-width="9"/>
-    <path d="M165,1800 C162,1690 186,1590 174,1490 C168,1435 183,1390 176,1335" stroke-width="9"/>
-    <path d="M82,1400 L34,1365 M82,1400 L128,1375" stroke-width="7"/>
-    <path d="M130,1330 L84,1298 M130,1330 L182,1305" stroke-width="7"/>
-    <path d="M176,1375 L130,1348 M176,1375 L226,1352" stroke-width="7"/>
-    <path d="M85,1310 L45,1285 M85,1310 L124,1288" stroke-width="6"/>
+  <!-- 인장 (붉은 낙관) -->
+  <g opacity="0.5">
+    <rect x="1108" y="1350" width="46" height="46" rx="4" fill="#B8362A"/>
+    <text x="1131" y="1380" font-family="'Nanum Myeongjo',serif" font-size="22" font-weight="800"
+          fill="#F2E9D8" text-anchor="middle">印</text>
+  </g>
+  <g opacity="0.35">
+    <rect x="46" y="418" width="34" height="34" rx="3" fill="#B8362A" transform="rotate(-8 63 435)"/>
+    <text x="63" y="441" font-family="'Nanum Myeongjo',serif" font-size="16" font-weight="800"
+          fill="#F2E9D8" text-anchor="middle" transform="rotate(-8 63 435)">畵</text>
+  </g>
+
+  <!-- 대나무 -->
+  <g opacity="0.24" stroke="#1C1A16" fill="none" stroke-linecap="round">
+    <path d="M75,1800 C68,1670 96,1580 78,1470 C70,1400 92,1355 82,1290" stroke-width="10"/>
+    <path d="M120,1800 C117,1650 142,1560 128,1440 C121,1360 140,1315 132,1250" stroke-width="10"/>
+    <path d="M165,1800 C162,1690 186,1590 174,1490 C168,1435 183,1390 176,1335" stroke-width="10"/>
+    <path d="M82,1400 L34,1365 M82,1400 L128,1375" stroke-width="8"/>
+    <path d="M130,1330 L84,1298 M130,1330 L182,1305" stroke-width="8"/>
+    <path d="M176,1375 L130,1348 M176,1375 L226,1352" stroke-width="8"/>
+    <path d="M85,1310 L45,1285 M85,1310 L124,1288" stroke-width="7"/>
   </g>
 
   <!-- 하단 근경 언덕 -->
   <path d="M0,1800 L0,1690 C110,1645 210,1690 310,1640 C410,1590 490,1660 590,1615
            C690,1570 770,1640 870,1595 C970,1555 1050,1620 1150,1580
            C1180,1568 1200,1578 1200,1592 L1200,1800 Z"
-        fill="#201E1B" opacity="0.075"/>
+        fill="#1C1A16" opacity="0.16"/>
 </svg>
