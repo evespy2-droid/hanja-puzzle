@@ -137,18 +137,30 @@
   .msg-line.ok{ color:#2e7d4f; }
   .msg-line.err{ color:#c94f4f; }
 
-  .verified-chip{
-    background:#EAF5EE;
-    border:1px solid #BFE0CB;
-    color:#215c37;
-    font-size:13.5px;
-    font-weight:600;
-    padding:10px 14px;
-    border-radius:12px;
-    margin-top:4px;
+  .review-box{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    background:var(--offwhite);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
     margin-bottom:16px;
   }
-  .verified-chip a{ color:#215c37; font-weight:700; }
+  .review-box img{ width:84px; height:104px; object-fit:cover; border-radius:8px; background:var(--line); flex:none; }
+  .review-box .review-idiom{ font-size:17px; font-weight:700; color:var(--seal); margin-bottom:4px; }
+  .review-box .review-author{ font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  .review-box .review-meaning{ font-size:13px; line-height:1.6; color:var(--ink); white-space:pre-line; }
+  input[type=password]{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:15px;
+    margin-bottom:12px;
+    font-family:inherit;
+  }
+  input[type=password]:focus{ outline:none; border-color:var(--seal); box-shadow:0 0 0 3px rgba(183,49,44,.08); }
 
   .storage-banner{ display:flex; align-items:flex-start; gap:10px; background:var(--offwhite);
     border-radius:12px; padding:12px 14px; font-size:12.5px; color:var(--muted); margin-bottom:18px; line-height:1.55; border:1px solid var(--line);}
@@ -334,25 +346,10 @@
   <div class="card">
     <h2>🖌️ 나의 포스터 올리기</h2>
 
-    <div id="codeModeBox">
-      <label for="codeInput">학생 인증 코드</label>
-      <input type="text" id="codeInput" maxlength="20" placeholder="선생님이 알려주신 코드를 입력하세요" />
-      <div class="row-btns" style="margin-bottom:6px;">
-        <button class="btn btn-dark" id="verifyCodeBtn">확인</button>
-      </div>
-      <div class="msg-line" id="codeMsg"></div>
-      <div class="verified-chip" id="verifiedChip" style="display:none;">
-        ✅ <b><span id="verifiedName"></span></b>님으로 확인되었어요 · <a href="#" id="changeCodeLink">다시 입력</a>
-      </div>
-    </div>
-
-    <div id="localNameBox" style="display:none;">
+    <div id="editStage">
       <label for="authorInput">이름 (또는 모둠)</label>
       <input type="text" id="authorInput" maxlength="20" placeholder="예: 3반 김한문" />
-      <p class="note" style="margin:-8px 0 16px;">아직 구글 시트 연동 전이라 이 기기에만 저장되는 테스트 모드예요. 연동 후에는 선생님이 나눠준 코드로 이름이 자동으로 확인돼요.</p>
-    </div>
 
-    <div id="posterFields" style="display:none;">
       <label for="idiomInput">나의 인생 사자성어</label>
       <input type="text" id="idiomInput" maxlength="24" placeholder="예: 初志一貫 (초지일관)" />
 
@@ -372,10 +369,30 @@
       </div>
 
       <div class="submit-wrap">
-        <button class="submit-btn" id="submitBtn" disabled>📮 포스터 제출하기</button>
-        <div class="form-status" id="formStatus"></div>
+        <button class="submit-btn" id="reviewBtn" disabled>✋ 다 됐어요! 선생님 호출하기</button>
       </div>
     </div>
+
+    <div id="teacherStage" style="display:none;">
+      <p class="note" style="margin-bottom:14px;">선생님, 학생이 완성한 내용을 확인한 뒤 확인 코드를 입력해주세요.</p>
+      <div class="review-box">
+        <img id="reviewThumb" src="" alt="포스터 미리보기" />
+        <div>
+          <div class="review-idiom hanja" id="reviewIdiom"></div>
+          <div class="review-author" id="reviewAuthor"></div>
+          <div class="review-meaning" id="reviewMeaning"></div>
+        </div>
+      </div>
+      <label for="teacherCodeInput">선생님 확인 코드</label>
+      <input type="password" id="teacherCodeInput" maxlength="30" placeholder="선생님만 아는 코드를 입력하세요" />
+      <div class="row-btns" style="margin-bottom:6px;">
+        <button class="btn btn-dark" id="registerBtn">등록하기</button>
+        <button class="btn btn-ghost" id="backEditBtn">다시 수정하기</button>
+      </div>
+      <div class="msg-line" id="teacherMsg"></div>
+    </div>
+
+    <div class="form-status" id="formStatus"></div>
   </div>
 
   <div class="card">
@@ -462,7 +479,7 @@
     });
     if(!res.ok) throw new Error('sheet save failed');
     const data = await res.json();
-    if(!data || data.ok !== true) throw new Error('sheet save rejected');
+    if(!data || data.ok !== true) throw new Error((data && data.error) || 'sheet save rejected');
     return true;
   }
   async function sheetListAll(){
@@ -553,7 +570,6 @@
     elConnectMsg.className = 'msg-line ok';
     refreshConnectUI();
     initStorageBanner();
-    initAuthMode();
     loadGallery();
   });
 
@@ -564,78 +580,10 @@
     elConnectMsg.className = 'msg-line';
     refreshConnectUI();
     initStorageBanner();
-    initAuthMode();
     loadGallery();
   });
 
   refreshConnectUI();
-
-  // ---- student code verification (prevents submitting under someone else's name) ----
-  let verifiedCode = null;
-  let verifiedAuthor = null;
-
-  function initAuthMode(){
-    if(SHEET_URL){
-      $('codeModeBox').style.display = 'block';
-      $('localNameBox').style.display = 'none';
-      $('posterFields').style.display = verifiedAuthor ? 'block' : 'none';
-    } else {
-      $('codeModeBox').style.display = 'none';
-      $('localNameBox').style.display = 'block';
-      $('posterFields').style.display = 'block';
-    }
-  }
-
-  function getAuthor(){
-    return SHEET_URL ? verifiedAuthor : $('authorInput').value.trim();
-  }
-
-  async function verifyCode(){
-    const code = $('codeInput').value.trim();
-    const msg = $('codeMsg');
-    if(!code){
-      msg.textContent = '코드를 입력해주세요.';
-      msg.className = 'msg-line err';
-      return;
-    }
-    msg.textContent = '확인 중...';
-    msg.className = 'msg-line';
-    try{
-      const res = await fetch(SHEET_URL + '?action=verify&code=' + encodeURIComponent(code));
-      const data = await res.json();
-      if(data && data.ok){
-        verifiedCode = code;
-        verifiedAuthor = data.name;
-        $('verifiedName').textContent = data.name;
-        $('verifiedChip').style.display = 'block';
-        $('codeInput').disabled = true;
-        $('verifyCodeBtn').disabled = true;
-        $('posterFields').style.display = 'block';
-        msg.textContent = '';
-      } else {
-        msg.textContent = (data && data.error) || '등록되지 않은 코드예요. 선생님께 코드를 다시 확인해주세요.';
-        msg.className = 'msg-line err';
-      }
-    } catch(err){
-      msg.textContent = '확인하지 못했어요. 인터넷 연결을 확인하고 다시 시도해주세요.';
-      msg.className = 'msg-line err';
-    }
-    updateSubmitState();
-  }
-
-  $('verifyCodeBtn').addEventListener('click', verifyCode);
-  $('changeCodeLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    verifiedCode = null;
-    verifiedAuthor = null;
-    $('codeInput').value = '';
-    $('codeInput').disabled = false;
-    $('verifyCodeBtn').disabled = false;
-    $('verifiedChip').style.display = 'none';
-    $('posterFields').style.display = 'none';
-    $('codeMsg').textContent = '';
-    updateSubmitState();
-  });
 
   // ---- form state ----
   let posterImageDataUrl = null;
@@ -692,54 +640,82 @@
   });
 
   function updateSubmitState(){
-    const author = getAuthor();
+    const author = $('authorInput').value.trim();
     const idiom = $('idiomInput').value.trim();
     const meaning = elMeaning.value.trim();
     const ok = author && idiom && meaning && posterImageDataUrl;
-    $('submitBtn').disabled = !ok;
+    $('reviewBtn').disabled = !ok;
   }
 
   function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
-  $('submitBtn').addEventListener('click', async () => {
-    const author = getAuthor();
-    const idiom = $('idiomInput').value.trim();
-    const meaning = elMeaning.value.trim();
-    if(!author || !idiom || !meaning || !posterImageDataUrl) return;
+  function resetForm(){
+    $('authorInput').value = '';
+    $('idiomInput').value = '';
+    $('meaningInput').value = '';
+    elCharCount.textContent = '0';
+    $('imageInput').value = '';
+    posterImageDataUrl = null;
+    $('previewWrap').classList.remove('show');
+    $('teacherStage').style.display = 'none';
+    $('editStage').style.display = 'block';
+    updateSubmitState();
+  }
 
-    const btn = $('submitBtn');
-    const elFormStatus = $('formStatus');
+  // ---- stage 1 -> 2: student shows the finished poster, teacher takes over from here ----
+  $('reviewBtn').addEventListener('click', () => {
+    $('reviewIdiom').textContent = $('idiomInput').value.trim();
+    $('reviewAuthor').textContent = $('authorInput').value.trim();
+    $('reviewMeaning').textContent = $('meaningInput').value.trim();
+    $('reviewThumb').src = posterImageDataUrl || '';
+    $('teacherCodeInput').value = '';
+    $('teacherMsg').textContent = '';
+    $('formStatus').textContent = '';
+    $('editStage').style.display = 'none';
+    $('teacherStage').style.display = 'block';
+  });
+
+  $('backEditBtn').addEventListener('click', () => {
+    $('teacherStage').style.display = 'none';
+    $('editStage').style.display = 'block';
+  });
+
+  $('registerBtn').addEventListener('click', async () => {
+    const teacherCode = $('teacherCodeInput').value.trim();
+    const msg = $('teacherMsg');
+    if(SHEET_URL && !teacherCode){
+      msg.textContent = '확인 코드를 입력해주세요.';
+      msg.className = 'msg-line err';
+      return;
+    }
+
+    const btn = $('registerBtn');
     btn.disabled = true;
-    elFormStatus.textContent = '제출 중...';
-    elFormStatus.className = 'form-status';
+    msg.textContent = '등록 중...';
+    msg.className = 'msg-line';
 
     const record = {
       id: uid(),
-      author, idiom, meaning,
+      author: $('authorInput').value.trim(),
+      idiom: $('idiomInput').value.trim(),
+      meaning: $('meaningInput').value.trim(),
       imageData: posterImageDataUrl,
       createdAt: new Date().toISOString()
     };
-    if(SHEET_URL) record.code = verifiedCode;
+    if(SHEET_URL) record.teacherCode = teacherCode;
 
     try{
       const ok = await Store.save(record.id, record);
       if(!ok) throw new Error('save failed');
-      elFormStatus.textContent = '포스터를 올렸어요! 아래 갤러리에서 확인해보세요. 🎉';
-      elFormStatus.className = 'form-status ok';
-      $('meaningInput').value = '';
-      elCharCount.textContent = '0';
-      $('idiomInput').value = '';
-      $('imageInput').value = '';
-      posterImageDataUrl = null;
-      $('previewWrap').classList.remove('show');
+      resetForm();
+      $('formStatus').textContent = '포스터가 등록됐어요! 아래 갤러리에서 확인해보세요. 🎉';
+      $('formStatus').className = 'form-status ok';
       loadGallery();
     } catch(err){
-      elFormStatus.textContent = SHEET_URL
-        ? '저장에 실패했어요. 인터넷 연결이나 구글 시트 연동 주소를 확인하고 다시 시도해주세요.'
-        : '이 브라우저에 저장하지 못했어요. 시크릿(비공개) 모드이거나 저장 공간이 꽉 찼을 수 있어요.';
-      elFormStatus.className = 'form-status err';
+      msg.textContent = (SHEET_URL && err.message) ? err.message : '등록하지 못했어요. 다시 시도해주세요.';
+      msg.className = 'msg-line err';
     } finally {
-      updateSubmitState();
+      btn.disabled = false;
     }
   });
 
@@ -807,7 +783,6 @@
   $('refreshBtn').addEventListener('click', loadGallery);
 
   initStorageBanner();
-  initAuthMode();
   updateSubmitState();
   loadGallery();
 </script>
