@@ -24,13 +24,13 @@
   <path d="M0,360 L0,300 C70,270 130,240 210,265 C290,290 330,205 410,230
            C490,255 545,300 625,270 C705,240 765,195 845,240
            C925,285 985,245 1065,275 C1130,300 1170,285 1200,305 L1200,360 Z"
-        fill="#8F7F5C" opacity="0.22"/>
+        fill="#9C9990" opacity="0.22"/>
 
   <!-- 중간 산 -->
   <path d="M0,480 L0,410 C60,375 125,355 205,388 C285,421 325,335 405,368
            C485,401 525,450 605,418 C685,386 745,335 825,378
            C905,421 965,388 1045,421 C1105,444 1165,430 1200,452 L1200,480 Z"
-        fill="#6E5F42" opacity="0.2"/>
+        fill="#7D7A70" opacity="0.2"/>
 
   <!-- 굵은 붓질 (기운찬 사선, 갈필 텍스처) -->
   <g opacity="0.5">
@@ -55,13 +55,13 @@
   </g>
 
   <!-- 매화 가지 -->
-  <g opacity="0.22" stroke="#8A422D" fill="none" stroke-linecap="round">
+  <g opacity="0.22" stroke="#3A3730" fill="none" stroke-linecap="round">
     <path d="M980,560 C960,620 1000,660 970,730 C950,775 990,810 965,870" stroke-width="5"/>
     <path d="M975,600 C1000,585 1030,595 1050,575" stroke-width="4"/>
     <path d="M968,690 C945,675 915,680 895,660" stroke-width="4"/>
     <path d="M968,760 C995,748 1020,755 1045,740" stroke-width="4"/>
   </g>
-  <g opacity="0.28" fill="#B8362A">
+  <g opacity="0.22" fill="#2A2823">
     <circle cx="1048" cy="573" r="7"/>
     <circle cx="1028" cy="585" r="6"/>
     <circle cx="893" cy="658" r="6"/>
@@ -74,7 +74,7 @@
   <path d="M0,600 L0,540 C90,515 170,545 260,520 C350,495 410,555 510,530
            C600,508 660,560 760,538 C850,518 920,555 1010,535
            C1080,520 1150,535 1200,548 L1200,600 Z"
-        fill="#5C4F38" opacity="0.14"/>
+        fill="#5F5C54" opacity="0.14"/>
 
   <!-- 굵은 붓질 2 (반대 대각선, 아래쪽) -->
   <g opacity="0.5">
@@ -94,18 +94,18 @@
   <path d="M760,1200 C860,1165 900,1260 1020,1225 C1090,1204 1060,1290 1160,1260"
         stroke="#1C1A16" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.22"/>
   <path d="M120,1300 C230,1265 265,1360 390,1325"
-        stroke="#B8362A" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.22"/>
+        stroke="#1C1A16" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.2"/>
 
-  <!-- 인장 (붉은 낙관) -->
-  <g opacity="0.5">
-    <rect x="1108" y="1350" width="46" height="46" rx="4" fill="#B8362A"/>
+  <!-- 인장 (먹으로 찍은 낙관) -->
+  <g opacity="0.4">
+    <rect x="1108" y="1350" width="46" height="46" rx="4" fill="#201E1B"/>
     <text x="1131" y="1380" font-family="'Nanum Myeongjo',serif" font-size="22" font-weight="800"
-          fill="#F2E9D8" text-anchor="middle">印</text>
+          fill="#F7F6F2" text-anchor="middle">印</text>
   </g>
-  <g opacity="0.35">
-    <rect x="46" y="418" width="34" height="34" rx="3" fill="#B8362A" transform="rotate(-8 63 435)"/>
+  <g opacity="0.3">
+    <rect x="46" y="418" width="34" height="34" rx="3" fill="#201E1B" transform="rotate(-8 63 435)"/>
     <text x="63" y="441" font-family="'Nanum Myeongjo',serif" font-size="16" font-weight="800"
-          fill="#F2E9D8" text-anchor="middle" transform="rotate(-8 63 435)">畵</text>
+          fill="#F7F6F2" text-anchor="middle" transform="rotate(-8 63 435)">畵</text>
   </g>
 
   <!-- 대나무 -->
